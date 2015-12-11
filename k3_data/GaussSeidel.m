@@ -1,9 +1,6 @@
-function T = GaussSeidel(T,aCoeff)
+function field = GaussSeidel(field, source,aCoeff)
 
-    rows = length(T);
-    
-    %Defining source term Su
-    Su = zeros(rows,1); %No source
+    rows = length(field);
     
     %Extracting variables from struct variable
     aP = aCoeff.point;
@@ -14,11 +11,11 @@ function T = GaussSeidel(T,aCoeff)
     %Performing Gauss-Seidel update
       for i = 2:rows-1
           %Calculating parts of update equation
-          Tn = T(i+1);
-          Ts = T(i-1);
+          Tn = field(i+1);
+          Ts = field(i-1);
             
           %Performing update on T(i,j)
-          T(i) = (aN(i)*Tn + aS(i)*Ts + Su(i))/aP(i);
+          field(i) = (aN(i)*Tn + aS(i)*Ts + source(i))/aP(i);
                   
       end
     
