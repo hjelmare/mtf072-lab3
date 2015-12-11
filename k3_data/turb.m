@@ -96,7 +96,7 @@ while error > max_error
       end
    else
        for j = 2:nj-1
-         vist(j) =  cMu * (k(j)^2)/epsi(j);
+         vist(j) =  cMu * (k(j)^2)/eps(j);
        end
    end
      
@@ -142,7 +142,7 @@ while error > max_error
 %  Compute the turbulent dissipation epsilon
    for j=2:nj-1
 %  compute epsi
-     epsi(j) = epsi(j) + urf*(epsi_new(j) - epsi(j));
+     eps(j) = eps(j) + urf*(epsi_new(j) - eps(j));
    end
 
   
