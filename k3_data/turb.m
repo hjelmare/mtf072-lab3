@@ -46,12 +46,12 @@ k(1)=0;
 for j=2:nj-1
    U(j)=1;
    k(j)=10^(-5);
-   epsi(j)=10^(-5);
+   eps(j)=10^(-5);
    vist(j)=10^(-5);
 end
 k(nj)=k(nj-1);
 U(nj)=U(nj-1);
-epsi(nj)=epsi(nj-1);
+eps(nj)=eps(nj-1);
 
 kappa=0.41;
 error=1;
@@ -60,9 +60,18 @@ max_error=0.001;
 urf=0.8;
 while error > max_error 
 
-count = count+1;
-% .... 
-% .. your finite volume code
+    count = count+1;
+    %Calculating source terms
+    Pk = (vist .* (dudy).^2);
+    
+    kSp = (-eps./ k) .* deltaY;
+    kSu = Pk .* deltaY;
+    
+    uSp = zeros(length,1);
+    uSu = ones(length,1) .* deltaY;
+    
+    epsSp = (-c2Eps .* eps) ./ k;
+    epsSu = (eps ./ k) * c1Eps .* Pk;
 %
 %
 %  Often it can be tricky to start the simulations. They often diverge.
@@ -135,6 +144,7 @@ count = count+1;
    end
   error = sum(R)/sum(F);
   
+
 end  %while
 %
 % plot
