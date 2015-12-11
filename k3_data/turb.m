@@ -35,7 +35,7 @@ for j=2:nj-1
 end
 y_node(nj)=yc(nj-1);
 
-%Calculating dY
+%Calculating dY and deltaY
 dY(:,1) = [0 diff(y_node(2:end)) 0]';
 dY(:,2) = [0 diff(y_node(1:end-1)) 0]';
 
