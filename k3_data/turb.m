@@ -29,6 +29,7 @@ load u_dns.dat
 load y_dns.dat
 yc=y_dns;          %yc is a vector contains the faces coordinates (grid)
 nj=length(yc)+1; % nj: number of node points  
+y_node = zeros(nj,1);
 u_dns(nj)=u_dns(nj-1);
 y_node(1)=yc(1);
 for j=2:nj-1
@@ -37,12 +38,17 @@ end
 y_node(nj)=yc(nj-1);
 
 %Calculating dY and deltaY
-dY(:,1) = [0 diff(y_node(2:end)) 0]';
-dY(:,2) = [0 diff(y_node(1:end-1)) 0]';
+dY(:,1) = [0 diff(y_node(2:end)') 0]';
+dY(:,2) = [0 diff(y_node(1:end-1)') 0]';
 deltaY = [1 diff(yc') 1]';
 
 
 % init velocity, vist, k & eps
+U = zeros(nj,1);
+k = zeros(nj,1);
+eps = zeros(nj,1);
+vist = zeros(nj,1);
+dudy = zeros(nj,1);
 U(1)=0;
 k(1)=0;
 for j=2:nj-1
@@ -101,8 +107,8 @@ while error > max_error
    kSp = (-eps./ k) .* deltaY;
    kSu = Pk .* deltaY;
 
-   uSp = zeros(length,1);
-   uSu = ones(length,1) .* deltaY;
+   uSp = zeros(nj,1);
+   uSu = ones(nj,1) .* deltaY;
 
    epsSp = (-c2Eps .* eps) ./ k;
    epsSu = (eps ./ k) * c1Eps .* Pk;
