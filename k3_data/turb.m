@@ -97,7 +97,7 @@ while error > max_error
       end
    else
        for j = 2:nj-1
-         vist(j) =  cMu * (k(j)^2)/epsi(j);
+         vist(j) =  cMu * (k(j)^2)/eps(j);
        end
    end
      
