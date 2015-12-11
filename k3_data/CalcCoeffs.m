@@ -6,7 +6,7 @@ aCoeff.point = zeros(length,1);
 aCoeff.north = zeros(length,1);
 aCoeff.south = zeros(length,1);
 
-for i = 1:length
+for i = 2:length-1
     aCoeff.point(i) = (((viscosity + vist(i+1)/sigma)/dY(i+1)) + ((viscosity + vist(i-1)/sigma)/dY(i-1)));
     aCoeff.north(i) = ((viscosity + vist(i+1)/sigma)/dY(i+1));
     aCoeff.south(i) = ((viscosity + vist(i-1)/sigma)/dY(i-1));
