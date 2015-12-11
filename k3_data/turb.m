@@ -82,18 +82,17 @@ while error > max_error
    if count < 2000   % use mixing length model for turbulent viscosity if count >2000
       for j=2:nj-1
 % compute turbulent viscosity
-         
          yplus=ustar*y_node(j)/viscos;
          damp=1-exp(-yplus/26);
          ell=min(damp*kappa*y_node(j),0.09);
-         vist(j)=urf*abs(dudy(j))*ell^2+(1-urf)*vist_old;
+         vist(j)=urf*abs(dudy(j))*ell^2+(1-urf)*vist_old(j);
       end
    else
        for j = 2:nj-1
          vist(j) =  cMu * (k(j)^2)/epsi(j);
        end
    end
-   
+     
    %Calculating source terms
    Pk = (vist .* (dudy).^2);
 
@@ -105,6 +104,7 @@ while error > max_error
 
    epsSp = (-c2Eps .* eps) ./ k;
    epsSu = (eps ./ k) * c1Eps .* Pk;
+ 
 %
 %
 % ....
@@ -119,22 +119,23 @@ while error > max_error
 % ....
 %
 % after having computed ap and su, use under-relaxation (see lecture notes) 
+% använder f.n samma urf som till vist, får se om det funkar...
 %  Compute the velocity U
    for j=2:nj-1
 %  compute U
-%    U(j)=...
+    U(j) = U(j) + urf*(U_new(j) - U(j));
    end
 
 %  Compute the turbulent kinetic energy k
    for j=2:nj-1
 %  compute k  
-%     k(j)=....
+     k(j) = k(j) + urf*(k_new(j) - k(j));
    end
 
 %  Compute the turbulent dissipation epsilon
    for j=2:nj-1
 %  compute epsi
-%     epsi(j)=...
+     epsi(j) = epsi(j) + urf*(epsi_new(j) - epsi(j));
    end
 
   
