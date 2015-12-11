@@ -59,19 +59,14 @@ count=0;
 max_error=0.001;
 urf=0.8;
 while error > max_error 
-
+    
     count = count+1;
-    %Calculating source terms
-    Pk = (vist .* (dudy).^2);
     
-    kSp = (-eps./ k) .* deltaY;
-    kSu = Pk .* deltaY;
+    % Compute the velocity gradient du/dy
+   for j=2:nj-1
+      dudy(j)= (U(j+1) - U(j-1)) / (dY(j,1) + dY(j,2));
+   end
     
-    uSp = zeros(length,1);
-    uSu = ones(length,1) .* deltaY;
-    
-    epsSp = (-c2Eps .* eps) ./ k;
-    epsSu = (eps ./ k) * c1Eps .* Pk;
 %
 %
 %  Often it can be tricky to start the simulations. They often diverge.
@@ -82,10 +77,7 @@ while error > max_error
 %  influence U since the viscosity is taken from the mixing-length model.
 
    vist_old=vist;
-% Compute the velocity gradient du/dy
-   for j=2:nj-1
-      dudy(j)= (U(j+1) - U(j-1)) / (dY(j,1) + dY(j,2));
-   end
+
    
    if count < 2000   % use mixing length model for turbulent viscosity if count >2000
       for j=2:nj-1
@@ -101,6 +93,18 @@ while error > max_error
          vist(j) =  cMu * (k(j)^2)/epsi(j);
        end
    end
+   
+   %Calculating source terms
+   Pk = (vist .* (dudy).^2);
+
+   kSp = (-eps./ k) .* deltaY;
+   kSu = Pk .* deltaY;
+
+   uSp = zeros(length,1);
+   uSu = ones(length,1) .* deltaY;
+
+   epsSp = (-c2Eps .* eps) ./ k;
+   epsSu = (eps ./ k) * c1Eps .* Pk;
 %
 %
 % ....
