@@ -125,7 +125,7 @@ while error > max_error
 %  Compute the turbulent kinetic energy k
    for j=2:nj-1
 %  compute k  
-     k(j) = k(j) + urf*(k_new(j) - k(j);
+     k(j) = k(j) + urf*(k_new(j) - k(j));
    end
 
 %  Compute the turbulent dissipation epsilon
