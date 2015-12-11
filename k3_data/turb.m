@@ -9,6 +9,7 @@
 %
 %close all
 clear
+clc
 format long
 
 %Defining simulation constants
