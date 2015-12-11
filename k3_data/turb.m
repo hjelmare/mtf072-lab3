@@ -11,6 +11,13 @@
 clear
 format long
 
+%Defining simulation constants
+cMu = 0.09;
+sigmaK = 1.00;
+sigmaEps = 1.30;
+c1Eps = 1.44;
+c2Eps = 1.92;
+
 % wall friction velocity
 ustar=1;
 % read u from DNS data base
