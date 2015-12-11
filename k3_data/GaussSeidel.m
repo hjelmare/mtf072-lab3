@@ -1,4 +1,4 @@
-function field = GaussSeidel(field, source,aCoeff)
+function field = GaussSeidel(field, Su,aCoeff)
 
     rows = length(field);
     
@@ -15,7 +15,7 @@ function field = GaussSeidel(field, source,aCoeff)
           Ts = field(i-1);
             
           %Performing update on T(i,j)
-          field(i) = (aN(i)*Tn + aS(i)*Ts + source(i))/aP(i);
+          field(i) = (aN(i)*Tn + aS(i)*Ts + Su(i))/aP(i);
                   
       end
     

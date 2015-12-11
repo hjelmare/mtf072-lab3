@@ -1,20 +1,25 @@
-function [ aCoeff ] = CalcCoeffs( sigma, dY, viscosity, vist, length )
+function [ aCoeff ] = CalcCoeffs( sigma, dY, deltaY, viscosity, vist, ...
+    Sp, length )
 %CALCCOEFFS Summary of this function goes here
 %   Detailed explanation goes here
 
-dYnorth = dY(:,1);
-dYsouth = dY(:,2);
+    dYnorth = dY(:,1);
+    dYsouth = dY(:,2);
+    
+    aCoeff.north = zeros(length,1);
+    aCoeff.south = zeros(length,1);
 
-aCoeff.point = zeros(length,1);
-aCoeff.north = zeros(length,1);
-aCoeff.south = zeros(length,1);
+    for i = 2:length-1
+        
+        vistNorth = (vist(i+1) - vist(i))*deltaY(i) / (2*dYnorth(i));
+        vistSouth = (vist(i) - vist(i-1))*deltaY(i) / (2*dYsouth(i));
+        
+        aCoeff.north(i) = ((viscosity + vistNorth/sigma)/dYnorth(i));
+        aCoeff.south(i) = ((viscosity + vistSouth/sigma)/dYsouth(i));
 
-for i = 1:length
-    aCoeff.point(i) = (((viscosity + vist(i+1)/sigma)/dYnorth(i)) + ((viscosity + vist(i-1)/sigma)/dYsouth(i)));
-    aCoeff.north(i) = ((viscosity + vist(i+1)/sigma)/dYnorth(i));
-    aCoeff.south(i) = ((viscosity + vist(i-1)/sigma)/dYsouth(i));
-end
-
+    end
+    
+    aCoeff.point = aCoeff.north + aCoeff.south - Sp; 
 
 
 end

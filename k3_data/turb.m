@@ -18,7 +18,7 @@ sigmaK = 1.00;
 sigmaEps = 1.30;
 c1Eps = 1.44;
 c2Eps = 1.92;
-viscos=1/395;
+visc=1/395;
 
 % wall friction velocity
 ustar=1;
@@ -90,7 +90,7 @@ while error > max_error
    if count < 2000   % use mixing length model for turbulent viscosity if count >2000
       for j=2:nj-1
 % compute turbulent viscosity
-         yplus=ustar*y_node(j)/viscos;
+         yplus=ustar*y_node(j)/visc;
          damp=1-exp(-yplus/26);
          ell=min(damp*kappa*y_node(j),0.09);
          vist(j)=urf*abs(dudy(j))*ell^2+(1-urf)*vist_old(j);
@@ -104,28 +104,29 @@ while error > max_error
    %Calculating source terms
    Pk = (vist .* (dudy).^2);
 
+   uSp = zeros(nj,1);
+   uSu = ones(nj,1) .* deltaY;
+   
    kSp = (-eps./ k) .* deltaY;
    kSu = Pk .* deltaY;
 
-   uSp = zeros(nj,1);
-   uSu = ones(nj,1) .* deltaY;
-
-   epsSp = (-c2Eps .* eps) ./ k;
-   epsSu = (eps ./ k) * c1Eps .* Pk;
+   epsSp = ((c1Eps .* Pk - c2Eps .* eps) ./ k) .* deltaY;
+   epsSu = zeros(nj,1);
  
-%
-%
-% ....
-% ....
-% ....
-% ....
-%  your finite volume code
-% ....
-% ....
-% ....
-% ....
-% ....
-%
+
+   %Calculating coefficients
+   UCoeff = CalcCoeffs( 1, dY, deltaY, visc, vist, uSp, nj);
+   kCoeff = CalcCoeffs( sigmaK, dY, deltaY, visc, vist, kSp, nj);
+   epsCoeff = CalcCoeffs( sigmaEps, dY, deltaY, visc, vist, epsSp, nj);
+   
+   %Gauss-Seidel iteration
+   U_new = GaussSeidel(U,uSu,UCoeff);
+   k_new = GaussSeidel(k,kSu,kCoeff);
+   eps_new = GaussSeidel(eps,epsSu,epsCoeff);
+   
+   
+   
+   
 % after having computed ap and su, use under-relaxation (see lecture notes) 
 % använder f.n samma urf som till vist, får se om det funkar...
 %  Compute the velocity U
@@ -186,7 +187,7 @@ load dns_data.dat
 % eps is normalized by ustar^4/viscos
 % your computed eps is normalized with ustar^3/delta=1
 %
-eps_dns=dns_data(:,2)*ustar^4/viscos;
+eps_dns=dns_data(:,2)*ustar^4/visc;
 plot(y_dns,eps_dns,'bo')
 xlabel('x')
 ylabel('dissipation of k')
