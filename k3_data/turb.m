@@ -106,22 +106,23 @@ count = count+1;
 % ....
 %
 % after having computed ap and su, use under-relaxation (see lecture notes) 
+% använder f.n samma urf som till vist, får se om det funkar...
 %  Compute the velocity U
    for j=2:nj-1
 %  compute U
-%    U(j)=...
+    U(j) = U(j) + urf*(U_new(j) - U(j));
    end
 
 %  Compute the turbulent kinetic energy k
    for j=2:nj-1
 %  compute k  
-%     k(j)=....
+     k(j) = k(j) + urf*(k_new(j) - k(j);
    end
 
 %  Compute the turbulent dissipation epsilon
    for j=2:nj-1
 %  compute epsi
-%     epsi(j)=...
+     epsi(j) = epsi(j) + urf*(epsi_new(j) - epsi(j));
    end
 
   
