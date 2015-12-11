@@ -36,7 +36,7 @@ end
 y_node(nj)=yc(nj-1);
 
 %Calculating dY
-dY(:,1) = [0 diff(y(2:end)) 0]';
+dY(:,1) = [0 diff(y_node(2:end)) 0]';
 dY(:,2) = [0 diff(y_node(1:end-1)) 0]';
 
 
@@ -75,7 +75,7 @@ count = count+1;
    vist_old=vist;
 % Compute the velocity gradient du/dy
    for j=2:nj-1
-%      dudy(j)=....
+      dudy(j)= (U(j+1) - U(j-1)) / (dY(j,1) + dY(j,2));
    end
    
    if count < 2000   % use mixing length model for turbulent viscosity if count >2000
@@ -88,7 +88,9 @@ count = count+1;
          vist(j)=urf*abs(dudy(j))*ell^2+(1-urf)*vist_old;
       end
    else
-%         vist(j)=   ..... your expression for 'vist'
+       for j = 2:nj-1
+         vist(j) =  cMu * (k(j)^2)/epsi(j);
+       end
    end
 %
 %
