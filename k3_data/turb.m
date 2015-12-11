@@ -9,6 +9,7 @@
 %
 %close all
 clear
+clc
 format long
 
 %Defining simulation constants
@@ -136,7 +137,7 @@ while error > max_error
 %  Compute the turbulent dissipation epsilon
    for j=2:nj-1
 %  compute epsi
-     epsi(j) = epsi(j) + urf*(epsi_new(j) - epsi(j));
+     eps(j) = eps(j) + urf*(eps_new(j) - eps(j));
    end
 
   
