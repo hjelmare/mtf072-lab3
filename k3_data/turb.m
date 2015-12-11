@@ -46,12 +46,12 @@ k(1)=0;
 for j=2:nj-1
    U(j)=1;
    k(j)=10^(-5);
-   epsi(j)=10^(-5);
+   eps(j)=10^(-5);
    vist(j)=10^(-5);
 end
 k(nj)=k(nj-1);
 U(nj)=U(nj-1);
-epsi(nj)=epsi(nj-1);
+eps(nj)=eps(nj-1);
 
 kappa=0.41;
 error=1;
@@ -60,78 +60,87 @@ max_error=0.001;
 urf=0.8;
 while error > max_error 
 
-count = count+1;
-% .... 
-% .. your finite volume code
-%
-%
-%  Often it can be tricky to start the simulations. They often diverge.
-%  It can then be useful to compute the turbulent viscosity from the 
-%  mixing-length model for the first 2000 iterations.
-%  In this way the K and EPS (or OMEGA) eqns. are de-coupled from U 
-%  for the first 2000 iterations, i.e. the K and EPS (or OMEGA) do not
-%  influence U since the viscosity is taken from the mixing-length model.
+    count = count+1;
+    
+    %Calculating source terms
+    Pk = (vist .* (dudy).^2);
+    
+    kSp = (-eps./ k) .* deltaY;
+    kSu = Pk .* deltaY;
+    
+    uSp = zeros(length,1);
+    uSu = ones(length,1) .* deltaY;
+    
+    epsSp = (-c2Eps .* eps) ./ k;
+    epsSu = (eps ./ k) * c1Eps .* Pk;
+    
+    %  Often it can be tricky to start the simulations. They often diverge.
+    %  It can then be useful to compute the turbulent viscosity from the 
+    %  mixing-length model for the first 2000 iterations.
+    %  In this way the K and EPS (or OMEGA) eqns. are de-coupled from U 
+    %  for the first 2000 iterations, i.e. the K and EPS (or OMEGA) do not
+    %  influence U since the viscosity is taken from the mixing-length model.
 
-   vist_old=vist;
-% Compute the velocity gradient du/dy
-   for j=2:nj-1
-%      dudy(j)=....
-   end
-   
-   if count < 2000   % use mixing length model for turbulent viscosity if count >2000
-      for j=2:nj-1
-% compute turbulent viscosity
-         
-         yplus=ustar*y_node(j)/viscos;
-         damp=1-exp(-yplus/26);
-         ell=min(damp*kappa*y_node(j),0.09);
-         vist(j)=urf*abs(dudy(j))*ell^2+(1-urf)*vist_old;
-      end
-   else
-%         vist(j)=   ..... your expression for 'vist'
-   end
-%
-%
-% ....
-% ....
-% ....
-% ....
-%  your finite volume code
-% ....
-% ....
-% ....
-% ....
-% ....
-%
-% after having computed ap and su, use under-relaxation (see lecture notes) 
-%  Compute the velocity U
-   for j=2:nj-1
-%  compute U
-%    U(j)=...
-   end
+       vist_old=vist;
+    % Compute the velocity gradient du/dy
+       for j=2:nj-1
+    %      dudy(j)=....
+       end
 
-%  Compute the turbulent kinetic energy k
-   for j=2:nj-1
-%  compute k  
-%     k(j)=....
-   end
+       if count < 2000   % use mixing length model for turbulent viscosity if count >2000
+          for j=2:nj-1
+    % compute turbulent viscosity
 
-%  Compute the turbulent dissipation epsilon
-   for j=2:nj-1
-%  compute epsi
-%     epsi(j)=...
-   end
+             yplus=ustar*y_node(j)/viscos;
+             damp=1-exp(-yplus/26);
+             ell=min(damp*kappa*y_node(j),0.09);
+             vist(j)=urf*abs(dudy(j))*ell^2+(1-urf)*vist_old;
+          end
+       else
+    %         vist(j)=   ..... your expression for 'vist'
+       end
+    %
+    %
+    % ....
+    % ....
+    % ....
+    % ....
+    %  your finite volume code
+    % ....
+    % ....
+    % ....
+    % ....
+    % ....
+    %
+    % after having computed ap and su, use under-relaxation (see lecture notes) 
+    %  Compute the velocity U
+       for j=2:nj-1
+    %  compute U
+    %    U(j)=...
+       end
 
-  
-% Convergence criterian (Check the error)
-   for j=2:nj-1
-% compute residuals R
-%     R(j)=...
-% compute the flux F
-%     F(j)=....
-   end
-  error = sum(R)/sum(F);
-  
+    %  Compute the turbulent kinetic energy k
+       for j=2:nj-1
+    %  compute k  
+    %     k(j)=....
+       end
+
+    %  Compute the turbulent dissipation epsilon
+       for j=2:nj-1
+    %  compute epsi
+    %     epsi(j)=...
+       end
+
+
+    % Convergence criterian (Check the error)
+       for j=2:nj-1
+    % compute residuals R
+    %     R(j)=...
+    % compute the flux F
+    %     F(j)=....
+       end
+      error = sum(R)/sum(F);
+
 end  %while
 %
 % plot
