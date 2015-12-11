@@ -8,7 +8,8 @@
 %
 %
 %close all
-clear
+clear all
+clc
 format long
 
 % wall friction velocity
@@ -54,6 +55,9 @@ while error > max_error
 count = count+1;
 % .... 
 % .. your finite volume code
+
+% eqs 2 & 3 maybe???
+
 %
 %
 %  Often it can be tricky to start the simulations. They often diverge.
@@ -89,6 +93,9 @@ count = count+1;
 % ....
 %  your finite volume code
 % ....
+
+% eq 1 maybe???
+
 % ....
 % ....
 % ....
