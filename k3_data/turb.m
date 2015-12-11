@@ -17,6 +17,7 @@ sigmaK = 1.00;
 sigmaEps = 1.30;
 c1Eps = 1.44;
 c2Eps = 1.92;
+viscos=1/395;
 
 % wall friction velocity
 ustar=1;
@@ -32,11 +33,12 @@ y_node(1)=yc(1);
 for j=2:nj-1
     y_node(j)= (yc(j)+yc(j-1))/2;
 end
-
 y_node(nj)=yc(nj-1);
 
-% viscosity
-viscos=1/395;
+%Calculating dY
+dY(:,1) = [0 diff(y(2:end)) 0]';
+dY(:,2) = [0 diff(y_node(1:end-1)) 0]';
+
 
 % init velocity, vist, k & eps
 U(1)=0;
