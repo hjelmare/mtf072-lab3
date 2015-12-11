@@ -7,7 +7,7 @@
 % See also Kim, Moin & Moser (1987, JFM, vol 177) and Mansour, Kim & Moin (1988, JFM, vol 194).
 %
 %
-%close all
+close all
 clear
 format long
 
@@ -129,6 +129,7 @@ end  %while
 % compare with DNS
 %
 % plot k
+%%
 figure(1)
 
 hold on
