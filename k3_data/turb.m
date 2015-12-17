@@ -77,6 +77,15 @@ while error > max_error
     % Compute the velocity gradient du/dy
    for j=2:nj-1
       dudy(j)= (U(j+1) - U(j-1)) / (dY(j,1) + dY(j,2));
+      
+      dN = dY(j,1);
+      dS = dY(j,2);
+      factor = dS^2/(2*dN*dS + dN^2);
+      
+      b = (U(j) - U(j-1) + ((U(j) - U(j+1))*factor))/(dS - dN*factor);
+      a = -(U(j) - U(j+1) + dN*b)*factor/dS^2;
+      disp(2*a-dS + b - dudy(j))
+      dudy(j) = 2*a*dS + b;
    end
     
 %
@@ -153,8 +162,10 @@ while error > max_error
 
   error = abs(R/F);
   
-  disp([R,F])
-  disp(max(epsCoeff.point))
+%   disp([R,F,max(diff(vist))])
+%   disp([ max(UCoeff.point) max(kCoeff.point) max(epsCoeff.point)])
+%   disp(max(epsSp))
+%   disp(' ')
 
 end  %while
 %
@@ -212,3 +223,6 @@ print uv.ps -deps
 %
 % Please note that all terms are normalized by ustar^4/viscos
 %
+
+
+close all
