@@ -20,8 +20,8 @@ c1Eps = 1.44;
 c2Eps = 1.92;
 visc=1/395;
 urC = 0.5;
-BCU = [2 0];
-BCk = [2 0];
+BCU = [0 0];
+BCk = [0 0];
 BCeps = [0 0];
 
 % wall friction velocity
@@ -127,13 +127,17 @@ while error > max_error
 
    uSp = zeros(nj,1);
    uSu = ones(nj,1) .* deltaY;
+   uSp(2) = -(cMu)^(1/4)*k(2)^(1/2)*deltaY(2)/U(2);
    
    kSp = (-eps./ k) .* deltaY;
    kSu = Pk .* deltaY;
+   kSp(2) = -cMu^(3/4)*k(2)^(1/2)*U(2);
+   kSu(2) = U(2);
 
    epsSp = ((c1Eps .* Pk - c2Eps .* eps) ./ k) .* deltaY;
-   %disp([epsSp,k])
    epsSu = zeros(nj,1);
+   epsSp(2) = -1e30;
+   epsSu(2) = cMu^(3/4)*k(2)^(3/2)*1e30/(kappa*deltaY(2));
  
 
    %Calculating coefficients
@@ -201,6 +205,7 @@ end  %while
 %
 % plot k
 
+%%
 
 
 % % % figure(1)
@@ -256,6 +261,7 @@ end  %while
 % % % 
 % % % 
 % % % close all
+
 
 %%
 
