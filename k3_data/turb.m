@@ -69,7 +69,7 @@ kappa=0.41;
 error=1;
 count=0;
 max_error=0.001;
-urf=0.8;
+urf=0.1;
 while error > max_error 
     
     count = count+1;
@@ -196,6 +196,7 @@ figure(3)
 hold on
 load uv_dns.dat
 plot(y_dns,-uv_dns,'bo')
+plot(y_node,U,'rx')
 xlabel('x')
 ylabel('turbulent shear stress -uv')
 legend('DNS','Calc.')
