@@ -147,8 +147,10 @@ while error > max_error
 % compute the flux F
      F = ComputeFlux(U,deltaY,nj);
 
-  error = R/F;
+  error = abs(R/F);
   
+  disp([R,F])
+  disp(max(epsCoeff.point))
 
 end  %while
 %
