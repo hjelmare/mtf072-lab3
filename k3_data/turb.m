@@ -19,6 +19,10 @@ sigmaEps = 1.30;
 c1Eps = 1.44;
 c2Eps = 1.92;
 visc=1/395;
+urC = 0.3;
+BCU = [2 0];
+BCk = [2 0];
+BCeps = [0 0];
 
 % wall friction velocity
 ustar=1;
@@ -113,9 +117,9 @@ while error > max_error
  
 
    %Calculating coefficients
-   UCoeff = CalcCoeffs( 1, dY, deltaY, visc, vist, uSp, nj);
-   kCoeff = CalcCoeffs( sigmaK, dY, deltaY, visc, vist, kSp, nj);
-   epsCoeff = CalcCoeffs( sigmaEps, dY, deltaY, visc, vist, epsSp, nj);
+   UCoeff = CalcCoeffs( 1, dY, deltaY, visc, vist, uSp, nj, BCU);
+   kCoeff = CalcCoeffs( sigmaK, dY, deltaY, visc, vist, kSp, nj, BCk);
+   epsCoeff = CalcCoeffs( sigmaEps, dY, deltaY, visc, vist, epsSp, nj,BCeps);
    
    %Gauss-Seidel iteration
    U_new = GaussSeidel(U,uSu,UCoeff);
@@ -130,16 +134,16 @@ while error > max_error
 %  Compute the velocity U
    
 %  compute U
-    U(2:nj-1) = U(2:nj-1) + urf.*(U_new(2:nj-1) - U(2:nj-1));
+    U(2:nj-1) = U(2:nj-1) + urC.*(U_new(2:nj-1) - U(2:nj-1));
    
 
 %  Compute the turbulent kinetic energy k
 %  compute k  
-     k(2:nj-1) = k(2:nj-1) + urf*(k_new(2:nj-1) - k(2:nj-1));
+     k(2:nj-1) = k(2:nj-1) + urC*(k_new(2:nj-1) - k(2:nj-1));
 
 %  Compute the turbulent dissipation epsilon
 %  compute epsi
-     eps(2:nj-1) = eps(2:nj-1) + urf*(eps_new(2:nj-1) - eps(2:nj-1));
+     eps(2:nj-1) = eps(2:nj-1) + urC*(eps_new(2:nj-1) - eps(2:nj-1));
   
 % Convergence criterian (Check the error)
 % compute residuals R
@@ -166,8 +170,8 @@ load v2_dns.dat
 load w2_dns.dat
 
 k_dns=0.5*(u2_dns+v2_dns+w2_dns);
+plot(y_node,k,'rx')
 plot(y_dns,k_dns,'bo')
-plot(y_node,k)
 xlabel('x')
 ylabel('turbulent kinetic energy, k')
 legend('Calc. k','DNS')
@@ -182,8 +186,8 @@ load dns_data.dat
 % your computed eps is normalized with ustar^3/delta=1
 %
 eps_dns=dns_data(:,2)*ustar^4/visc;
+plot(y_node,eps,'rx');
 plot(y_dns,eps_dns,'bo')
-plot(y_node,eps);
 xlabel('x')
 ylabel('dissipation of k')
 legend('Calc. eps','DNS')
