@@ -30,13 +30,13 @@ ustar=1;
 load u_dns.dat
 
 % read y from DNS data base
-load y_dns.dat
+ load y_dns.dat
 yc=y_dns;          %yc is a vector contains the faces coordinates (grid)
 nj=length(yc)+1; % nj: number of node points  
 y_node = zeros(nj,1);
 u_dns(nj)=u_dns(nj-1);
 y_node(1)=yc(1);
-for j=2:nj-1
+for j=2:nj-1   
     y_node(j)= (yc(j)+yc(j-1))/2;
 end
 y_node(nj)=yc(nj-1);
@@ -143,8 +143,7 @@ while error > max_error
    k_new = GaussSeidel(k,kSu,kCoeff);
    eps_new = GaussSeidel(eps,epsSu,epsCoeff);
    
-   disp([epsCoeff.point, epsCoeff.south,epsCoeff.north])
-   pause
+   %disp([epsCoeff.point, epsCoeff.south,epsCoeff.north])
    
 % after having computed ap and su, use under-relaxation (see lecture notes) 
 %  Compute the velocity U
@@ -168,6 +167,7 @@ while error > max_error
      F = ComputeFlux(U,deltaY,nj);
 
   error = abs(R/F);
+  disp(error);
   
 %   disp([R,F,max(diff(vist))])
 %   disp([ max(UCoeff.point) max(kCoeff.point) max(epsCoeff.point)])
@@ -240,13 +240,16 @@ end  %while
 % % % 
 % % % 
 % % % close all
+
+%%
+
 figure(1)
-contourf(UStore)
+contourf(UStore(1:80,:))
 colorbar
 figure(2)
-contourf(kStore)
+contourf(kStore(1:80,:))
 colorbar
 figure(3)
-contourf(epsStore)
+contourf(epsStore(1:80,:))
 colorbar
 
