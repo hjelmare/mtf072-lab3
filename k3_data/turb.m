@@ -70,13 +70,17 @@ error=1;
 count=0;
 max_error=0.001;
 urf=0.8;
+disp('Go!')
+UStore = [];
+kStore = [];
+epsStore = [];
 while error > max_error 
     
     count = count+1;
     
     % Compute the velocity gradient du/dy
    for j=2:nj-1
-      dudy(j)= (U(j+1) - U(j-1)) / (dY(j,1) + dY(j,2));
+      %dudy(j)= (U(j+1) - U(j-1)) / (dY(j,1) + dY(j,2));
       
       dN = dY(j,1);
       dS = dY(j,2);
@@ -84,7 +88,6 @@ while error > max_error
       
       b = (U(j) - U(j-1) + ((U(j) - U(j+1))*factor))/(dS - dN*factor);
       a = -(U(j) - U(j+1) + dN*b)*factor/dS^2;
-      disp(2*a-dS + b - dudy(j))
       dudy(j) = 2*a*dS + b;
    end
     
@@ -139,7 +142,6 @@ while error > max_error
    
    
 % after having computed ap and su, use under-relaxation (see lecture notes) 
-% använder f.n samma urf som till vist, får se om det funkar...
 %  Compute the velocity U
    
 %  compute U
@@ -162,10 +164,14 @@ while error > max_error
 
   error = abs(R/F);
   
-%   disp([R,F,max(diff(vist))])
-%   disp([ max(UCoeff.point) max(kCoeff.point) max(epsCoeff.point)])
-%   disp(max(epsSp))
-%   disp(' ')
+  disp([R,F,max(diff(vist))])
+  disp([ max(UCoeff.point) max(kCoeff.point) max(epsCoeff.point)])
+  disp(max(epsSp))
+  disp(' ')
+  
+  UStore = [UStore U];
+  kStore = [kStore k];
+  epsStore = [epsStore eps];
 
 end  %while
 %
