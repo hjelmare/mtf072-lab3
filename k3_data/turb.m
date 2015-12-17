@@ -96,9 +96,7 @@ while error > max_error
          vist(j)=urf*abs(dudy(j))*ell^2+(1-urf)*vist_old(j);
       end
    else
-       for j = 2:nj-1
-         vist(j) =  cMu * (k(j)^2)/eps(j);
-       end
+       vist(2:nj-1) =  cMu .* (k(2:nj-1).^2)./eps(2:nj-1);
    end
      
    %Calculating source terms
@@ -130,32 +128,26 @@ while error > max_error
 % after having computed ap and su, use under-relaxation (see lecture notes) 
 % använder f.n samma urf som till vist, får se om det funkar...
 %  Compute the velocity U
-   for j=2:nj-1
+   
 %  compute U
-    U(j) = U(j) + urf*(U_new(j) - U(j));
-   end
+    U(2:nj-1) = U(2:nj-1) + urf.*(U_new(2:nj-1) - U(2:nj-1));
+   
 
 %  Compute the turbulent kinetic energy k
-   for j=2:nj-1
 %  compute k  
-     k(j) = k(j) + urf*(k_new(j) - k(j));
-   end
+     k(2:nj-1) = k(2:nj-1) + urf*(k_new(2:nj-1) - k(2:nj-1));
 
 %  Compute the turbulent dissipation epsilon
-   for j=2:nj-1
 %  compute epsi
-     eps(j) = eps(j) + urf*(eps_new(j) - eps(j));
-   end
-
+     eps(2:nj-1) = eps(2:nj-1) + urf*(eps_new(2:nj-1) - eps(2:nj-1));
   
 % Convergence criterian (Check the error)
-   for j=2:nj-1
 % compute residuals R
-%     R(j)=...
+     R = ComputeResidual(U,UCoeff,uSu,k,kCoeff,kSu,eps,epsCoeff,epsSu,nj);
 % compute the flux F
-%     F(j)=....
-   end
-  error = sum(R)/sum(F);
+     F = ComputeFlux();
+
+  error = R/F;
   
 
 end  %while
