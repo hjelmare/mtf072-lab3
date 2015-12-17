@@ -19,7 +19,7 @@ sigmaEps = 1.30;
 c1Eps = 1.44;
 c2Eps = 1.92;
 visc=1/395;
-urC = 0.1;
+urC = 0.5;
 BCU = [2 0];
 BCk = [2 0];
 BCeps = [0 0];
@@ -69,13 +69,16 @@ kappa=0.41;
 error=1;
 count=0;
 max_error=0.001;
+max_error=0.1;
 urf=0.8;
 
 disp('Go!')
 UStore = [];
 kStore = [];
 epsStore = [];
+
 %%
+old_error = error;
 while error > max_error 
 %while count < 200
     
@@ -142,6 +145,11 @@ while error > max_error
    U_new = GaussSeidel(U,uSu,UCoeff);
    k_new = GaussSeidel(k,kSu,kCoeff);
    eps_new = GaussSeidel(eps,epsSu,epsCoeff);
+   
+   U_new(end,:) = U_new(end-1,:);
+   k_new(end,:) = k_new(end-1,:);
+   eps_new(end,:) = eps_new(end-1,:);
+   
    %disp([epsCoeff.point, epsCoeff.south,epsCoeff.north])
    
 % after having computed ap and su, use under-relaxation (see lecture notes) 
@@ -166,17 +174,26 @@ while error > max_error
      F = ComputeFlux(U,deltaY,nj);
 
   error = abs(R/F);
-  disp(error);
+  if(mod(count,200) == 0)
+      UStore = [UStore U];
+      kStore = [kStore k];
+      epsStore = [epsStore eps];
+      
+      if(error > old_error)
+          urC = max(0.5*urC , 0.5);
+      else
+          urC = min(1.05*urC , 1);
+      end
+      disp([error, urC]);
+      old_error = error;
+  end
   
 %   disp([R,F,max(diff(vist))])
 %   disp([ max(UCoeff.point) max(kCoeff.point) max(epsCoeff.point)])
 %   disp(max(epsSp))
 %   disp(' ')
   
-  UStore = [UStore U];
-  kStore = [kStore k];
-  epsStore = [epsStore eps];
-
+  
 end  %while
 %
 % plot
@@ -243,12 +260,15 @@ end  %while
 %%
 
 figure(1)
-contourf(UStore(1:80,:))
+contourf(UStore)
+%contourf(UStore(1:80,:))
 colorbar
 figure(2)
-contourf(kStore(1:80,:))
+contourf(kStore)
+%contourf(kStore(1:80,:))
 colorbar
 figure(3)
-contourf(epsStore(1:80,:))
+contourf(epsStore)
+%contourf(epsStore(1:80,:))
 colorbar
 
