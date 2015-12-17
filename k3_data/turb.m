@@ -165,7 +165,7 @@ load w2_dns.dat
 
 k_dns=0.5*(u2_dns+v2_dns+w2_dns);
 plot(y_dns,k_dns,'bo')
-plot(y_dns,k)
+plot(y_node,k)
 xlabel('x')
 ylabel('turbulent kinetic energy, k')
 legend('Calc. k','DNS')
@@ -181,7 +181,7 @@ load dns_data.dat
 %
 eps_dns=dns_data(:,2)*ustar^4/visc;
 plot(y_dns,eps_dns,'bo')
-plot(y_dns,eps);
+plot(y_node,eps);
 xlabel('x')
 ylabel('dissipation of k')
 legend('Calc. eps','DNS')
