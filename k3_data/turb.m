@@ -145,7 +145,7 @@ while error > max_error
 % compute residuals R
      R = ComputeResidual(U,UCoeff,uSu,k,kCoeff,kSu,eps,epsCoeff,epsSu,nj);
 % compute the flux F
-     F = ComputeFlux();
+     F = ComputeFlux(U,deltaY,nj);
 
   error = R/F;
   
@@ -165,7 +165,7 @@ load w2_dns.dat
 
 k_dns=0.5*(u2_dns+v2_dns+w2_dns);
 plot(y_dns,k_dns,'bo')
-hold
+plot(y_dns,k)
 xlabel('x')
 ylabel('turbulent kinetic energy, k')
 legend('Calc. k','DNS')
@@ -181,6 +181,7 @@ load dns_data.dat
 %
 eps_dns=dns_data(:,2)*ustar^4/visc;
 plot(y_dns,eps_dns,'bo')
+plot(y_dns,eps);
 xlabel('x')
 ylabel('dissipation of k')
 legend('Calc. eps','DNS')
