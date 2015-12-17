@@ -19,7 +19,7 @@ sigmaEps = 1.30;
 c1Eps = 1.44;
 c2Eps = 1.92;
 visc=1/395;
-urC = 0.3;
+urC = 0.1;
 BCU = [2 0];
 BCk = [2 0];
 BCeps = [0 0];
@@ -69,7 +69,7 @@ kappa=0.41;
 error=1;
 count=0;
 max_error=0.001;
-urf=0.1;
+urf=0.8;
 while error > max_error 
     
     count = count+1;
@@ -84,7 +84,7 @@ while error > max_error
       
       b = (U(j) - U(j-1) + ((U(j) - U(j+1))*factor))/(dS - dN*factor);
       a = -(U(j) - U(j+1) + dN*b)*factor/dS^2;
-      disp(2*a-dS + b - dudy(j))
+      
       dudy(j) = 2*a*dS + b;
    end
     
@@ -135,8 +135,8 @@ while error > max_error
    k_new = GaussSeidel(k,kSu,kCoeff);
    eps_new = GaussSeidel(eps,epsSu,epsCoeff);
    
-   
-   
+   disp([epsCoeff.point, epsCoeff.south,epsCoeff.north])
+   pause
    
 % after having computed ap and su, use under-relaxation (see lecture notes) 
 % använder f.n samma urf som till vist, får se om det funkar...
@@ -186,6 +186,7 @@ plot(y_dns,k_dns,'bo')
 xlabel('x')
 ylabel('turbulent kinetic energy, k')
 legend('Calc. k','DNS')
+axis([0 1 0 5])
 print k.ps -deps
 
 % plot epsi
@@ -202,6 +203,7 @@ plot(y_dns,eps_dns,'bo')
 xlabel('x')
 ylabel('dissipation of k')
 legend('Calc. eps','DNS')
+axis([0 1 0 90])
 print eps.ps -deps
 
 % plot shear stress
@@ -213,6 +215,7 @@ plot(y_node,U,'rx')
 xlabel('x')
 ylabel('turbulent shear stress -uv')
 legend('DNS','Calc.')
+axis([0 1 0 1])
 print uv.ps -deps
 
 % Compare also with the different terms in the k-eq. 
@@ -226,4 +229,4 @@ print uv.ps -deps
 %
 
 
-close all
+%close all
