@@ -75,7 +75,7 @@ disp('Go!')
 UStore = [];
 kStore = [];
 epsStore = [];
-
+%%
 while error > max_error 
 %while count < 200
     
@@ -142,7 +142,6 @@ while error > max_error
    U_new = GaussSeidel(U,uSu,UCoeff);
    k_new = GaussSeidel(k,kSu,kCoeff);
    eps_new = GaussSeidel(eps,epsSu,epsCoeff);
-   
    %disp([epsCoeff.point, epsCoeff.south,epsCoeff.north])
    
 % after having computed ap and su, use under-relaxation (see lecture notes) 
