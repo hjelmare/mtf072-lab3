@@ -119,7 +119,7 @@ while error > max_error
          vist(j)=urf*abs(dudy(j))*ell^2+(1-urf)*vist_old(j);
       end
    else
-       vist(2:nj-1) =  cMu .* (k(2:nj-1).^2)./eps(2:nj-1);
+       vist(2:nj-1) =  cMu .* (k(2:nj-1).^2)./eps(2:nj-1);  
    end
      
    %Calculating source terms
@@ -127,7 +127,7 @@ while error > max_error
 
    uSp = zeros(nj,1);
    uSu = ones(nj,1) .* deltaY;
-   uSp(2) = -(cMu)^(1/4)*k(2)^(1/2)*deltaY(2)/U(2);
+   uSp(2) = -(cMu)^(1/4)*k(2)^(1/2)/U(2);
    
    kSp = (-eps./ k) .* deltaY;
    kSu = Pk .* deltaY;
@@ -136,8 +136,8 @@ while error > max_error
 
    epsSp = ((c1Eps .* Pk - c2Eps .* eps) ./ k) .* deltaY;
    epsSu = zeros(nj,1);
-   epsSp(2) = -1e30;
-   epsSu(2) = cMu^(3/4)*k(2)^(3/2)*1e30/(kappa*deltaY(2));
+   epsSp(2) = -1e10;
+   epsSu(2) = cMu^(3/4)*k(2)^(3/2)*1e10/(kappa*deltaY(2));
  
 
    %Calculating coefficients
