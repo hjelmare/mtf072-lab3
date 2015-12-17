@@ -30,13 +30,13 @@ ustar=1;
 load u_dns.dat
 
 % read y from DNS data base
-load y_dns.dat
+ load y_dns.dat
 yc=y_dns;          %yc is a vector contains the faces coordinates (grid)
 nj=length(yc)+1; % nj: number of node points  
 y_node = zeros(nj,1);
 u_dns(nj)=u_dns(nj-1);
 y_node(1)=yc(1);
-for j=2:nj-1
+for j=2:nj-1   
     y_node(j)= (yc(j)+yc(j-1))/2;
 end
 y_node(nj)=yc(nj-1);
@@ -146,8 +146,7 @@ while error > max_error
    U_new = GaussSeidel(U,uSu,UCoeff);
    k_new = GaussSeidel(k,kSu,kCoeff);
    eps_new = GaussSeidel(eps,epsSu,epsCoeff);
-   
-  
+   %disp([epsCoeff.point, epsCoeff.south,epsCoeff.north])
    
 % after having computed ap and su, use under-relaxation (see lecture notes) 
 %  Compute the velocity U
@@ -171,6 +170,7 @@ while error > max_error
      F = ComputeFlux(U,deltaY,nj);
 
   error = abs(R/F);
+  disp(error);
   
 %   disp([R,F,max(diff(vist))])
 %   disp([ max(UCoeff.point) max(kCoeff.point) max(epsCoeff.point)])
@@ -190,68 +190,71 @@ end  %while
 
 %%
 
-figure(1)
 
-hold on
-load u2_dns.dat
-load v2_dns.dat
-load w2_dns.dat
-
-k_dns=0.5*(u2_dns+v2_dns+w2_dns);
-plot(y_node,k,'rx')
-plot(y_dns,k_dns,'bo')
-xlabel('x')
-ylabel('turbulent kinetic energy, k')
-legend('Calc. k','DNS')
-print k.ps -deps
-
-% plot epsi
-figure(2)
-hold on
-load dns_data.dat
-
-% eps is normalized by ustar^4/viscos
-% your computed eps is normalized with ustar^3/delta=1
-%
-eps_dns=dns_data(:,2)*ustar^4/visc;
-plot(y_node,eps,'rx');
-plot(y_dns,eps_dns,'bo')
-xlabel('x')
-ylabel('dissipation of k')
-legend('Calc. eps','DNS')
-print eps.ps -deps
-
-% plot shear stress
-figure(3)
-hold on
-load uv_dns.dat
-plot(y_dns,-uv_dns,'bo')
-plot(y_node,U,'rx')
-xlabel('x')
-ylabel('turbulent shear stress -uv')
-legend('DNS','Calc.')
-print uv.ps -deps
-
-% Compare also with the different terms in the k-eq. 
-% Read DNS data from file 'dns_data.dat'
-%
-% 6 coulumns as below:
-%
-%      y+         Diss        prod     vel_p_grad   Turb_diff   Visc_diff
-%
-% Please note that all terms are normalized by ustar^4/viscos
-%
-
+% % % figure(1)
+% % % 
+% % % hold on
+% % % load u2_dns.dat
+% % % load v2_dns.dat
+% % % load w2_dns.dat
+% % % 
+% % % k_dns=0.5*(u2_dns+v2_dns+w2_dns);
+% % % plot(y_node,k,'rx')
+% % % plot(y_dns,k_dns,'bo')
+% % % xlabel('x')
+% % % ylabel('turbulent kinetic energy, k')
+% % % legend('Calc. k','DNS')
+% % % print k.ps -deps
+% % % 
+% % % % plot epsi
+% % % figure(2)
+% % % hold on
+% % % load dns_data.dat
+% % % 
+% % % % eps is normalized by ustar^4/viscos
+% % % % your computed eps is normalized with ustar^3/delta=1
+% % % %
+% % % eps_dns=dns_data(:,2)*ustar^4/visc;
+% % % plot(y_node,eps,'rx');
+% % % plot(y_dns,eps_dns,'bo')
+% % % xlabel('x')
+% % % ylabel('dissipation of k')
+% % % legend('Calc. eps','DNS')
+% % % print eps.ps -deps
+% % % 
+% % % % plot shear stress
+% % % figure(3)
+% % % hold on
+% % % load uv_dns.dat
+% % % plot(y_dns,-uv_dns,'bo')
+% % % xlabel('x')
+% % % ylabel('turbulent shear stress -uv')
+% % % legend('DNS','Calc.')
+% % % print uv.ps -deps
+% % % 
+% % % % Compare also with the different terms in the k-eq. 
+% % % % Read DNS data from file 'dns_data.dat'
+% % % %
+% % % % 6 coulumns as below:
+% % % %
+% % % %      y+         Diss        prod     vel_p_grad   Turb_diff   Visc_diff
+% % % %
+% % % % Please note that all terms are normalized by ustar^4/viscos
+% % % %
+% % % 
+% % % 
+% % % close all
 
 
 %%
+
 figure(1)
-contourf(UStore)
+contourf(UStore(1:80,:))
 colorbar
 figure(2)
-contourf(kStore)
+contourf(kStore(1:80,:))
 colorbar
 figure(3)
-contourf(epsStore)
+contourf(epsStore(1:80,:))
 colorbar
 
