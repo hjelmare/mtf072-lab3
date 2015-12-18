@@ -20,9 +20,9 @@ c1Eps = 1.44;
 c2Eps = 1.92;
 visc=1/395;
 urC = 0.1;
-BCU = [0 0];
-BCk = [0 0];
-BCeps = [0 0];
+BCU = [2 2];
+BCk = [2 2];
+BCeps = [2 2];
 
 % wall friction velocity
 ustar=1;
@@ -69,7 +69,7 @@ kappa=0.41;
 error=1;
 count=0;
 max_error=0.001;
-max_error=0.1;
+max_error=0.001;
 urf=0.8;
 
 disp('Go!')
@@ -83,6 +83,11 @@ while error > max_error
 %while count < 200
     
     count = count+1;
+    % implementing boundary conditions
+    U(end) = U(end-1);
+    k(end) = k(end-1);
+    eps(end) = eps(end-1);
+    eps(1) = eps(2);
     
     % Compute the velocity gradient du/dy
    for j=2:nj-1
@@ -127,18 +132,14 @@ while error > max_error
 
    uSp = zeros(nj,1);
    uSu = ones(nj,1) .* deltaY;
-   uSp(2) = -(cMu)^(1/4)*k(2)^(1/2);%*deltaY(2); % /U(2);
-
    
    kSp = (-eps./ k) .* deltaY;
    kSu = Pk .* deltaY;
-   kSp(2) = -cMu^(3/4)*k(2)^(1/2);%*U(2);
-   kSu(2) = U(2);
 
    epsSp = ((c1Eps .* Pk - c2Eps .* eps) ./ k) .* deltaY;
-   epsSu = zeros(nj,1);
-   epsSp(2) = -1e10;
-   epsSu(2) = cMu^(3/4)*k(2)^(3/2)*1e10/(kappa*deltaY(2));
+   epsSu = zeros(nj,1); 
+%    epsSp = (( - c2Eps .* eps) ./ k) .* deltaY;
+%    epsSu = eps.*c1Eps .* Pk .* deltaY ./ k;
  
 
    %Calculating coefficients
@@ -151,9 +152,9 @@ while error > max_error
    k_new = GaussSeidel(k,kSu,kCoeff);
    eps_new = GaussSeidel(eps,epsSu,epsCoeff);
    
-   U_new(end,:) = U_new(end-1,:);
-   k_new(end,:) = k_new(end-1,:);
-   eps_new(end,:) = eps_new(end-1,:);
+%    U_new(end,:) = U_new(end-1,:);
+%    k_new(end,:) = k_new(end-1,:);
+%    eps_new(end,:) = eps_new(end-1,:);
    
    %disp([epsCoeff.point, epsCoeff.south,epsCoeff.north])
    
@@ -238,17 +239,20 @@ plot(y_dns,eps_dns,'bo')
 xlabel('x')
 ylabel('dissipation of k')
 legend('Calc. eps','DNS')
+axis([0 1 0 90])
 print eps.ps -deps
 
 % plot shear stress
 figure(3)
 hold on
-load uv_dns.dat
-plot(y_dns,-uv_dns,'bo')
+load u_dns.dat
+plot(y_node,U,'rx')
+plot(y_dns,u_dns,'bo')
+
 xlabel('x')
-ylabel('turbulent shear stress -uv')
-legend('DNS','Calc.')
-print uv.ps -deps
+ylabel('U')
+legend('Calc.','DNS')
+print u.ps -deps
 
 % Compare also with the different terms in the k-eq. 
 % Read DNS data from file 'dns_data.dat'
