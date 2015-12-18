@@ -244,6 +244,7 @@ figure(3)
 hold on
 load uv_dns.dat
 plot(y_dns,-uv_dns,'bo')
+plot(y_node,dudy,'rx')
 xlabel('x')
 ylabel('turbulent shear stress -uv')
 legend('DNS','Calc.')
