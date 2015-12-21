@@ -138,13 +138,13 @@ while error > max_error
 %    epsSp(2) = -1e10;
 %    epsSu(2) = cMu^(3/4)*k(2)^(3/2)*1e10/(kappa*deltaY(2));
 %    
-   RSp = (-eps./k).*deltaY;
-   RSu = (eps).*deltaY;
+   RSp = -C2 .* (dRtdy).^2 .* deltaY ./ R;
+   RSu = C1 .* Slambda .* deltaY;
  
 
    %Calculating coefficients
    UCoeff = CalcCoeffs( 1, dY, deltaY, visc, vist, uSp, nj, BCU);
-   RCoeff = CalcCoeffs( sigmaR, dY, deltaY, visc, vist, RSp, nj, BCR);
+   RCoeff = CalcRCoeffs(U, sigma, dY, deltaY, viscosity, vist,Sp,nj, BCR);
    % using visc and vist since rho = 1 --> kin_visc = dyn_visc
    
    %Gauss-Seidel iteration
