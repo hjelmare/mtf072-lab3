@@ -124,6 +124,7 @@ while count < 2
    cMu = 3 * (1 + eta.^2).*alpha1 ./ (3 + eta.^2 + 6*eta.^2 .* xi.^2 + 6*xi.^2);
    
    
+   
    %Computing Rtilde gradient dRtildedy
    Rtilde = k .* Tt;
    for j=2:nj-1      
@@ -142,7 +143,7 @@ while count < 2
    C2 = min(2*cMu,cMuTilde * sqrt(1 + (C1/(6*cMuTilde))));
    sigma = cMu + damping./sqrt(2);
    Slambda = sqrt(eps .* cNy .* psi.^2 .* Rtilde);
-   
+      
 %
 %
 %  Often it can be tricky to start the simulations. They often diverge.
@@ -155,17 +156,19 @@ while count < 2
    vist_old=vist;
 
    
-%    if count < 2000   % use mixing length model for turbulent viscosity if count >2000
-%       for j=2:nj-1
-% % compute turbulent viscosity
-%          yplus=ustar*y_node(j)/visc;
-%          damp=1-exp(-yplus/26);
-%          ell=min(damp*kappa*y_node(j),0.09);
-%          vist(j)=urf*abs(dudy(j))*ell^2+(1-urf)*vist_old(j);
-%       end
-%    else
-       vist(2:nj-1) =  cMu(2:nj-1).*damping(2:nj-1).*k(2:nj-1).*Tt(2:nj-1);
-   %end
+   if count < -1 %2000   % use mixing length model for turbulent viscosity if count >2000
+      for j=2:nj-1
+% compute turbulent viscosity
+         yplus=ustar*y_node(j)/visc;
+         damp=1-exp(-yplus/26);
+         ell=min(damp*kappa*y_node(j),0.09);
+         vist(j)=urf*abs(dudy(j))*ell^2+(1-urf)*vist_old(j);
+      end
+   else
+       vist(2:nj) =  cMu(2:nj).*damping(2:nj).*k(2:nj).*Tt(2:nj);
+   end
+   
+
      
    %Calculating source terms
    %Pk = (vist .* (dudy).^2);
@@ -177,7 +180,7 @@ while count < 2
    disp('Hej')
    disp(RSp(end-1))
    RSu = C1 .* Slambda .* deltaY;
- 
+    
    dampingSu = ones(nj,1);
    
    L_sq = psi.*(2*psi + cMu .* R ./visc).*sqrt(visc^3./eps);
@@ -190,11 +193,14 @@ while count < 2
    % using visc and vist since rho = 1 --> kin_visc = dyn_visc
    
    %Gauss-Seidel iteration
+   figure(1*count + 1)
+   plot(U)
    U_new = GaussSeidel(U,uSu,UCoeff);
+   figure(2*count + 2)
+   plot(U_new)
+   
    R_new = GaussSeidel(R,RSu,RCoeff);
    damping_new = GaussSeidel(damping, dampingSu, dampingCoeff);
-   
-   
    
    %disp([epsCoeff.point, epsCoeff.south,epsCoeff.north])
    
@@ -205,6 +211,11 @@ while count < 2
     U(2:nj-1) = U(2:nj-1) + urC.*(U_new(2:nj-1) - U(2:nj-1));
     R(2:nj-1) = R(2:nj-1) + urC.*(R_new(2:nj-1) - R(2:nj-1));
     damping(2:nj-1) = damping(2:nj-1) + urC.*(damping_new(2:nj-1) - damping(2:nj-1));
+    
+    U(end) = U(end-1);
+    R(end) = R(end-1);
+    damping(end) = damping(end-1);
+   
    
     U(end) = U(end-1);
     R(end) = R(end-1);
