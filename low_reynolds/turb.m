@@ -88,8 +88,8 @@ epsStore = [];
 
 %%
 old_error = error;
-while error > max_error 
-%while count < 200
+%while error > max_error 
+while count < 2
     
     count = count+1;
     
@@ -122,6 +122,7 @@ while error > max_error
    eta = alpha2 .* Tt .* S;
    xi = alpha3 .* Tt .* W;
    cMu = 3 * (1 + eta.^2).*alpha1 ./ (3 + eta.^2 + 6*eta.^2 .* xi.^2 + 6*xi.^2);
+   
    
    %Computing Rtilde gradient dRtildedy
    Rtilde = k .* Tt;
@@ -163,7 +164,7 @@ while error > max_error
          vist(j)=urf*abs(dudy(j))*ell^2+(1-urf)*vist_old(j);
       end
    else
-       vist(2:nj-1) =  cMu .* (k(2:nj-1).^2)./eps(2:nj-1);
+       vist(2:nj-1) =  cMu(2:nj-1).*damping(2:nj-1).*k(2:nj-1).*Tt(2:nj-1);
    end
      
    %Calculating source terms
@@ -188,12 +189,14 @@ while error > max_error
    RSp = -C2 .* (dRtildedy).^2 .* deltaY ./ R;
    RSu = C1 .* Slambda .* deltaY;
  
-   dampingSu = 1;
+   dampingSu = ones(nj,1);
+   
+   L_sq = psi.*(2*psi + cMu .* R ./visc).*sqrt(visc^3./eps);
 
    %Calculating coefficients
    UCoeff = CalcCoeffs( 1, dY, deltaY, visc, vist, uSp, nj, BCU);
    RCoeff = CalcRCoeffs(U, sigma, dY, deltaY, visc, vist,RSp,nj, BCR);
-   dampingCoeff = CarcDampingCoeff(L_sq, dY, nj, BCDamping);
+   dampingCoeff = CalcDampingCoeffs(L_sq, dY, nj, BCDamping);
    % using visc and vist since rho = 1 --> kin_visc = dyn_visc
    
    %Gauss-Seidel iteration
@@ -217,15 +220,18 @@ while error > max_error
    
 % Create k and eps again
 Calpha = sqrt(cMu.^2 + (visc)./(R + visc));
-Salpha = (2*Calpha.*falpha)./(3*visc).*((sqrt(U.^2/2))./(1+(vist)./(visc))).^2;
 eta = S - W;
 falpha = 1 - exp(-(vist)/(36*visc));
+Salpha = (2*Calpha.*falpha)./(3*visc).*((sqrt(U.^2/2))./(1+(vist)./(visc))).^2;
 fk = 1 - (falpha)/sqrt(2) .* sqrt(max(1-Re, 0));
 Stilde = fk.*(S - (abs(eta) - eta)/sqrt(2));
 Sk = sqrt(Stilde.^2 + Salpha.^2);
 ktilde = damping.^0.8 .* sqrt(cMu) .* R .* Sk;
-k = sqrt(ktilde.^2 + kalpha.^2);
-    
+k = sqrt(ktilde.^2 + (visc.*Salpha).^2);
+
+disp([max(abs(imag(k)))])
+
+   
 % Convergence criterian (Check the error)
 % compute residuals R
      residual = ComputeResidual(U,UCoeff,uSu,R,RCoeff,RSu,nj);
@@ -251,8 +257,8 @@ k = sqrt(ktilde.^2 + kalpha.^2);
 %   disp([ max(UCoeff.point) max(kCoeff.point) max(epsCoeff.point)])
 %   disp(max(epsSp))
 %   disp(' ')
-  
-  
+    
+
 end  %while
 %
 % plot
@@ -262,6 +268,7 @@ end  %while
 
 %%
 
+break
 
 figure(1)
 
@@ -322,15 +329,15 @@ print uv.ps -deps
 %%
 
 figure(1)
-contourf(UStore)
+contourf(imag(UStore))
 %contourf(UStore(1:80,:))
 colorbar
 figure(2)
-contourf(kStore)
+contourf(imag(kStore))
 %contourf(kStore(1:80,:))
 colorbar
 figure(3)
-contourf(epsStore)
+contourf(imag(epsStore))
 %contourf(epsStore(1:80,:))
 colorbar
 
