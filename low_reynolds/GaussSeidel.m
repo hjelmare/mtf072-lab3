@@ -16,6 +16,7 @@ function field = GaussSeidel(field, Su,aCoeff)
             
           %Performing update on T(i,j)
           field(i) = (aN(i)*Tn + aS(i)*Ts + Su(i))/aP(i);
+          %disp(field(i))
                   
       end
     
