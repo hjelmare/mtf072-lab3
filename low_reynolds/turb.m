@@ -142,7 +142,7 @@ while count < 2
    C1 = 2 * cMu .* psi .* (1 - cMu .* psi);
    C2 = min(2*cMu,cMuTilde * sqrt(1 + (C1/(6*cMuTilde))));
    sigma = cMu + damping./sqrt(2);
-   Slambda = sqrt(eps .* cNy .* psi.^2 .* Rtilde);
+   Slambda = eps .* cNy .* psi.^2 .* Tt;
       
 %
 %
@@ -165,7 +165,7 @@ while count < 2
          vist(j)=urf*abs(dudy(j))*ell^2+(1-urf)*vist_old(j);
       end
    else
-       vist(2:nj) =  cMu(2:nj).*damping(2:nj).*k(2:nj).*Tt(2:nj);
+       vist =  cMu.*damping.*k.*Tt;
    end
    
 
