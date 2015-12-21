@@ -14,15 +14,13 @@ format long
 
 %Defining simulation constants
 cMu = 0.09;
-sigmaK = 1.00;
-sigmaEps = 1.30;
+sigmaR = 1;     % just guessing...
 c1Eps = 1.44;
 c2Eps = 1.92;
 visc=1/395;
 urC = 0.1;
 BCU = [0 0];
-BCk = [0 0];
-BCeps = [0 0];
+BCR = [0 0];
 
 % wall friction velocity
 ustar=1;
@@ -51,6 +49,7 @@ deltaY = [1 diff(yc') 1]';
 U = zeros(nj,1);
 k = zeros(nj,1);
 eps = zeros(nj,1);
+R = zeros(nj,1);
 vist = zeros(nj,1);
 dudy = zeros(nj,1);
 U(1)=0;
@@ -122,61 +121,58 @@ while error > max_error
    end
      
    %Calculating source terms
-   Pk = (vist .* (dudy).^2);
+   %Pk = (vist .* (dudy).^2);
 
    uSp = zeros(nj,1);
    uSu = ones(nj,1) .* deltaY;
    uSp(2) = -(cMu)^(1/4)*k(2)^(1/2);%*deltaY(2); % /U(2);
    
-   kSp = (-eps./ k) .* deltaY;
-   kSu = Pk .* deltaY;
-   kSp(2) = -cMu^(3/4)*k(2)^(1/2);%*U(2);
-   kSu(2) = U(2);
-
-   epsSp = ((c1Eps .* Pk - c2Eps .* eps) ./ k) .* deltaY;
-   epsSu = zeros(nj,1);
-   epsSp(2) = -1e10;
-   epsSu(2) = cMu^(3/4)*k(2)^(3/2)*1e10/(kappa*deltaY(2));
+%   Perhaps useful reference for b.c. implementation
+%    kSp = (-eps./ k) .* deltaY;
+%    kSu = Pk .* deltaY;
+%    kSp(2) = -cMu^(3/4)*k(2)^(1/2);%*U(2);
+%    kSu(2) = U(2);
+% 
+%    epsSp = ((c1Eps .* Pk - c2Eps .* eps) ./ k) .* deltaY;
+%    epsSu = zeros(nj,1);
+%    epsSp(2) = -1e10;
+%    epsSu(2) = cMu^(3/4)*k(2)^(3/2)*1e10/(kappa*deltaY(2));
+%    
+   RSp = (-eps./k).*deltaY;
+   RSu = (eps).*deltaY;
  
 
    %Calculating coefficients
    UCoeff = CalcCoeffs( 1, dY, deltaY, visc, vist, uSp, nj, BCU);
-   kCoeff = CalcCoeffs( sigmaK, dY, deltaY, visc, vist, kSp, nj, BCk);
-   epsCoeff = CalcCoeffs( sigmaEps, dY, deltaY, visc, vist, epsSp, nj,BCeps);
+   RCoeff = CalcCoeffs( sigmaR, dY, deltaY, visc, vist, RSp, nj, BCR);
+   % using visc and vist since rho = 1 --> kin_visc = dyn_visc
    
    %Gauss-Seidel iteration
    U_new = GaussSeidel(U,uSu,UCoeff);
-   k_new = GaussSeidel(k,kSu,kCoeff);
-   eps_new = GaussSeidel(eps,epsSu,epsCoeff);
+   R_new = GaussSeidel(R,RSu,RCoeff);
    
    U_new(end,:) = U_new(end-1,:);
-   k_new(end,:) = k_new(end-1,:);
-   eps_new(end,:) = eps_new(end-1,:);
+   R_new(end,:) = R_new(end-1,:);
    
    %disp([epsCoeff.point, epsCoeff.south,epsCoeff.north])
    
 % after having computed ap and su, use under-relaxation (see lecture notes) 
 %  Compute the velocity U
    
-%  compute U
+%  compute U & R
     U(2:nj-1) = U(2:nj-1) + urC.*(U_new(2:nj-1) - U(2:nj-1));
+    R(2:nj-1) = R(2:nj-1) + urC.*(R_new(2:nj-1) - R(2:nj-1));
    
-
-%  Compute the turbulent kinetic energy k
-%  compute k  
-     k(2:nj-1) = k(2:nj-1) + urC*(k_new(2:nj-1) - k(2:nj-1));
-
-%  Compute the turbulent dissipation epsilon
-%  compute epsi
-     eps(2:nj-1) = eps(2:nj-1) + urC*(eps_new(2:nj-1) - eps(2:nj-1));
-  
+% Create k and eps again
+% ...
+    
 % Convergence criterian (Check the error)
 % compute residuals R
-     R = ComputeResidual(U,UCoeff,uSu,k,kCoeff,kSu,eps,epsCoeff,epsSu,nj);
+     residual = ComputeResidual(U,UCoeff,uSu,R,RCoeff,RSu,nj);
 % compute the flux F
      F = ComputeFlux(U,deltaY,nj);
 
-  error = abs(R/F);
+  error = abs(residual/F);
   if(mod(count,200) == 0)
       UStore = [UStore U];
       kStore = [kStore k];

@@ -1,0 +1,5 @@
+Bara lite saker vi inte får glömma bort att fixa
+
+1. Räkna ut k och eps från R
+2. Kolla på ekv. 3 i LRN och ev justera uträkningen av vist
+3. -
