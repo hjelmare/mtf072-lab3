@@ -21,8 +21,14 @@ visc=1/395;
 C1 = 0.48;
 C2 = 0.08;
 urC = 0.1;
+<<<<<<< HEAD
 BCU = [2 2];
 BCR = [2 2];
+=======
+BCU = [0 0];
+BCR = [0 0];
+BCDamping = [0 0];  % Not sure...
+>>>>>>> 793168034b6703024df0b427abee42fc4663a18d
 
 % wall friction velocity
 ustar=1;
@@ -52,6 +58,7 @@ U = zeros(nj,1);
 k = zeros(nj,1);
 eps = zeros(nj,1);
 R = zeros(nj,1);
+damping = 0.5 * ones(nj,1);
 vist = zeros(nj,1);
 dudy = zeros(nj,1);
 U(1)=0;
@@ -67,6 +74,9 @@ k(nj)=k(nj-1);
 U(nj)=U(nj-1);
 eps(nj)=eps(nj-1);
 R(nj) = R(nj-1);
+damping(1) = 0;
+damping(nj) = damping(nj-1);
+
 
 kappa=0.41;
 error=1;
@@ -155,18 +165,22 @@ while error > max_error
    RSp = -C2 .* (dRtdy).^2 .* deltaY ./ R;
    RSu = C1 .* Slambda .* deltaY;
  
+   dampingSu = 1;
 
    %Calculating coefficients
    UCoeff = CalcCoeffs( 1, dY, deltaY, visc, vist, uSp, nj, BCU);
    RCoeff = CalcRCoeffs(U, sigma, dY, deltaY, viscosity, vist,Sp,nj, BCR);
+   dampingCoeff = CarcDampingCoeff(L_sq, dY, nj, BCDamping);
    % using visc and vist since rho = 1 --> kin_visc = dyn_visc
    
    %Gauss-Seidel iteration
    U_new = GaussSeidel(U,uSu,UCoeff);
    R_new = GaussSeidel(R,RSu,RCoeff);
+   damping_new = GaussSeidel(damping, dampingSu, dampingCoeff);
    
-   U_new(end,:) = U_new(end-1,:);
-   R_new(end,:) = R_new(end-1,:);
+   U_new(end) = U_new(end-1);
+   R_new(end) = R_new(end-1);
+   damping(end) = damping(end-1);
    
    %disp([epsCoeff.point, epsCoeff.south,epsCoeff.north])
    
@@ -176,6 +190,7 @@ while error > max_error
 %  compute U & R
     U(2:nj-1) = U(2:nj-1) + urC.*(U_new(2:nj-1) - U(2:nj-1));
     R(2:nj-1) = R(2:nj-1) + urC.*(R_new(2:nj-1) - R(2:nj-1));
+    damping(2:nj-1) = damping(2:nj-1) + urC.*(damping_new(2:nj-1) - damping(2:nj-1));
    
 % Create k and eps again
 % ...
