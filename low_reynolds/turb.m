@@ -25,7 +25,6 @@ BCU = [2 2];
 BCR = [2 2];
 BCDamping = [2 2];  % Not sure...
 
-
 % wall friction velocity
 ustar=1;
 % read u from DNS data base
@@ -216,7 +215,9 @@ while error > max_error
     damping(2:nj-1) = damping(2:nj-1) + urC.*(damping_new(2:nj-1) - damping(2:nj-1));
    
 % Create k and eps again
-% ...
+Sk = sqrt(Stilde.^2 + Salpha.^2);
+ktilde = damping.^0.8 .* sqrt(cMu) .* R .* Sk;
+k = sqrt(ktilde.^2 + kalpha.^2);
     
 % Convergence criterian (Check the error)
 % compute residuals R
