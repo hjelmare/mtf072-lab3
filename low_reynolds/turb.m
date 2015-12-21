@@ -169,27 +169,17 @@ while count < 20
        vist(2:nj) =  cMu(2:nj).*damping(2:nj).*k(2:nj).*Tt(2:nj);
    end
    
+
      
    %Calculating source terms
    %Pk = (vist .* (dudy).^2);
 
    uSp = zeros(nj,1);
-   uSu = ones(nj,1) .* deltaY;
-   %uSp(2) = -(cMu)^(1/4)*k(2)^(1/2);%*deltaY(2); % /U(2);
-   
-%   Perhaps useful reference for b.c. implementation
-%    kSp = (-eps./ k) .* deltaY;
-%    kSu = Pk .* deltaY;
-%    kSp(2) = -cMu^(3/4)*k(2)^(1/2);%*U(2);
-%    kSu(2) = U(2);
-% 
-%    epsSp = ((c1Eps .* Pk - c2Eps .* eps) ./ k) .* deltaY;
-%    epsSu = zeros(nj,1);
-%    epsSp(2) = -1e10;
-%    epsSu(2) = cMu^(3/4)*k(2)^(3/2)*1e10/(kappa*deltaY(2));
-%    
+   uSu = ones(nj,1) .* deltaY;    
    
    RSp = -C2 .* (dRtildedy).^2 .* deltaY ./ R;
+   disp('Hej')
+   disp(RSp(end-1))
    RSu = C1 .* Slambda .* deltaY;
     
    dampingSu = ones(nj,1);
@@ -198,7 +188,8 @@ while count < 20
 
    %Calculating coefficients
    UCoeff = CalcCoeffs( 1, dY, deltaY, visc, vist, uSp, nj, BCU);
-   RCoeff = CalcRCoeffs(U, R, sigma, dY, deltaY, visc, vist,RSp,nj, BCR);
+   [RCoeff,Su] = CalcRCoeffs2(U, R, sigma, dY, deltaY, visc, vist,RSp,nj, BCR);
+   RSu = RSu - Su; 
    dampingCoeff = CalcDampingCoeffs(L_sq, dY, nj, BCDamping);
    % using visc and vist since rho = 1 --> kin_visc = dyn_visc
    
@@ -222,6 +213,10 @@ while count < 20
     damping(end) = damping(end-1);
    
    
+    U(end) = U(end-1);
+    R(end) = R(end-1);
+    damping(end) = damping(end-1);
+    
 % Create k and eps again
 Calpha = sqrt(cMu.^2 + (visc)./(R + visc));
 eta = S - W;
@@ -232,8 +227,6 @@ Stilde = fk.*(S - (abs(eta) - eta)/sqrt(2));
 Sk = sqrt(Stilde.^2 + Salpha.^2);
 ktilde = damping.^0.8 .* sqrt(cMu) .* R .* Sk;
 k = sqrt(ktilde.^2 + (visc.*Salpha).^2);
-
-disp([max(abs(imag(k)))])
 
    
 % Convergence criterian (Check the error)
