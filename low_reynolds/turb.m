@@ -195,7 +195,7 @@ while count < 2
 
    %Calculating coefficients
    UCoeff = CalcCoeffs( 1, dY, deltaY, visc, vist, uSp, nj, BCU);
-   RCoeff = CalcRCoeffs(U, sigma, dY, deltaY, visc, vist,RSp,nj, BCR);
+   RCoeff = CalcRCoeffs(U, R, sigma, dY, deltaY, visc, vist,RSp,nj, BCR);
    dampingCoeff = CalcDampingCoeffs(L_sq, dY, nj, BCDamping);
    % using visc and vist since rho = 1 --> kin_visc = dyn_visc
    
