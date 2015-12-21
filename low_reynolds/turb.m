@@ -56,6 +56,7 @@ R = zeros(nj,1);
 damping = 0.5 * ones(nj,1);
 vist = zeros(nj,1);
 dudy = zeros(nj,1);
+dRtildedy = zeros(nj,1);
 U(1)=0;
 k(1)=0;
 for j=2:nj-1
@@ -134,6 +135,13 @@ while error > max_error
 
       dRtildedy(j) = 2*a*dS + b;
    end
+   
+   %Computing other coefficients
+   C1 = 2 * cMu .* psi .* (1 - cMu .* psi);
+   C2 = min(2*cMu,cMuTilde * sqrt(1 + (C1/(6*cMuTilde))));
+   sigma = cMu + damping./sqrt(2);
+   Slambda = sqrt(eps .* cNy .* psi.^2 .* Rtilde);
+   
 %
 %
 %  Often it can be tricky to start the simulations. They often diverge.
@@ -185,7 +193,7 @@ while error > max_error
 
    %Calculating coefficients
    UCoeff = CalcCoeffs( 1, dY, deltaY, visc, vist, uSp, nj, BCU);
-   RCoeff = CalcRCoeffs(U, sigma, dY, deltaY, viscosity, vist,Sp,nj, BCR);
+   RCoeff = CalcRCoeffs(U, sigma, dY, deltaY, visc, vist,RSp,nj, BCR);
    dampingCoeff = CarcDampingCoeff(L_sq, dY, nj, BCDamping);
    % using visc and vist since rho = 1 --> kin_visc = dyn_visc
    
