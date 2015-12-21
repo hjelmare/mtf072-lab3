@@ -21,14 +21,10 @@ visc=1/395;
 C1 = 0.48;
 C2 = 0.08;
 urC = 0.1;
-<<<<<<< HEAD
 BCU = [2 2];
 BCR = [2 2];
-=======
-BCU = [0 0];
-BCR = [0 0];
-BCDamping = [0 0];  % Not sure...
->>>>>>> 793168034b6703024df0b427abee42fc4663a18d
+BCDamping = [2 2];  % Not sure...
+
 
 % wall friction velocity
 ustar=1;
@@ -68,11 +64,12 @@ for j=2:nj-1
    k(j)=10^(-5);
    eps(j)=10^(-5);
    vist(j)=10^(-5);
-   R = k(j)^2/eps(j);
+   R(j) = k(j)^2/eps(j);
 end
 k(nj)=k(nj-1);
 U(nj)=U(nj-1);
 eps(nj)=eps(nj-1);
+eps(1) = eps(2);
 R(nj) = R(nj-1);
 damping(1) = 0;
 damping(nj) = damping(nj-1);
@@ -113,13 +110,31 @@ while error > max_error
    %Computing cMu
    S = dudy .* sqrt(2);
    W = 2*dudy;
-   Re = abs(W./S);
+   Re = sqrt(2);%abs(W./S);
    Tt = sqrt(k.^2 ./ eps.^2 + 2*visc./eps);
-   cNy = 1 / (2*(1 + Tt .* S .* sqrt(1 + Re.^2)));
+   psi = Tt .* S .* max(1,Re);
+   cNy = 1 ./ (2*(1 + Tt .* S .* sqrt(1 + Re.^2)));
+   Pib = cNy.^2 .* psi.^2;
    g = (1 + 2 * cNy .* psi.^2).^(-1);
+   alpha1 = g .* (0.25 + (2/3)* Pib.^(1/2));
+   alpha2 = 3 * g ./ (8*sqrt(2));
+   alpha3 = 3 * alpha2/sqrt(2);
    eta = alpha2 .* Tt .* S;
-   cMu = 3 * (1 + eta.^2).*alpha1 ./ (3 + eta.^2 + 6*eta.^2*xi.^2 + 6*xi.^2);
-    
+   xi = alpha3 .* Tt .* W;
+   cMu = 3 * (1 + eta.^2).*alpha1 ./ (3 + eta.^2 + 6*eta.^2 .* xi.^2 + 6*xi.^2);
+   
+   %Computing Rtilde gradient dRtildedy
+   Rtilde = k .* Tt;
+   for j=2:nj-1      
+      dN = dY(j,1);
+      dS = dY(j,2);
+      factor = dS^2/(2*dN*dS + dN^2);
+      
+      b = (Rtilde(j) - Rtilde(j-1) + ((Rtilde(j) - Rtilde(j+1))*factor))/(dS - dN*factor);
+      a = -(Rtilde(j) - Rtilde(j+1) + dN*b)*factor/dS^2;
+
+      dRtildedy(j) = 2*a*dS + b;
+   end
 %
 %
 %  Often it can be tricky to start the simulations. They often diverge.
@@ -162,7 +177,7 @@ while error > max_error
 %    epsSp(2) = -1e10;
 %    epsSu(2) = cMu^(3/4)*k(2)^(3/2)*1e10/(kappa*deltaY(2));
 %    
-   RSp = -C2 .* (dRtdy).^2 .* deltaY ./ R;
+   RSp = -C2 .* (dRtildedy).^2 .* deltaY ./ R;
    RSu = C1 .* Slambda .* deltaY;
  
    dampingSu = 1;
