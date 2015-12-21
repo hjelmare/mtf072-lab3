@@ -16,8 +16,8 @@ function [ aCoeff ] = CalcRCoeffs(U, sigma, dY, deltaY, viscosity, vist, ...
         Un = U(i) + (U(i+1) - U(i))*deltaY(i) / (2*dYnorth(i));
         Us = U(i) - (U(i) - U(i-1))*deltaY(i) / (2*dYsouth(i));
         
-        aCoeff.north(i) = ((viscosity + vistNorth/sigma)/dYnorth(i)) - Un*deltaY(i)/(2*dYnorth(i));
-        aCoeff.south(i) = ((viscosity + vistSouth/sigma)/dYsouth(i)) + Us*deltaY(i)/(2*dYsouth(i));
+        aCoeff.north(i) = ((viscosity + vistNorth/sigma(i))/dYnorth(i)) - Un*deltaY(i)/(2*dYnorth(i));
+        aCoeff.south(i) = ((viscosity + vistSouth/sigma(i))/dYsouth(i)) + Us*deltaY(i)/(2*dYsouth(i));
 
     end
     

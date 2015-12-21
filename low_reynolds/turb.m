@@ -176,8 +176,10 @@ while error > max_error
 %    epsSp(2) = -1e10;
 %    epsSu(2) = cMu^(3/4)*k(2)^(3/2)*1e10/(kappa*deltaY(2));
 %    
-   RSp = -C2 .* (dRtildedy).^2 .* deltaY ./ R;
-   RSu = C1 .* Slambda .* deltaY;
+   
+%FIX THESE!
+   %RSp = -C2 .* (dRtildedy).^2 .* deltaY ./ R;
+   %RSu = C1 .* Slambda .* deltaY;
  
    dampingSu = 1;
 
@@ -207,6 +209,12 @@ while error > max_error
     damping(2:nj-1) = damping(2:nj-1) + urC.*(damping_new(2:nj-1) - damping(2:nj-1));
    
 % Create k and eps again
+Calpha = sqrt(cMu.^2 + (visc)./(R + visc));
+Salpha = (2*Calpha.*falpha)./(3*visc).*((sqrt(U.^2/2))./(1+(vist)./(visc))).^2;
+eta = S - W;
+falpha = 1 - exp(-(vist)/(36*visc));
+fk = 1 - (falpha)/sqrt(2) .* sqrt(max(1-Re, 0));
+Stilde = fk.*(S - (abs(eta) - eta)/sqrt(2));
 Sk = sqrt(Stilde.^2 + Salpha.^2);
 ktilde = damping.^0.8 .* sqrt(cMu) .* R .* Sk;
 k = sqrt(ktilde.^2 + kalpha.^2);
