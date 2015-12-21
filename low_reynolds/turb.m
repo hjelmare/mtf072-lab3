@@ -69,7 +69,6 @@ kappa=0.41;
 error=1;
 count=0;
 max_error=0.001;
-max_error=0.1;
 urf=0.8;
 
 disp('Go!')
