@@ -124,7 +124,7 @@ while count < 20
    xi = alpha3 .* Tt .* W;
    cMu = 3 * (1 + eta.^2).*alpha1 ./ (3 + eta.^2 + 6*eta.^2 .* xi.^2 + 6*xi.^2);
    
-   
+    
    
    %Computing Rtilde gradient dRtildedy
    Rtilde = k .* Tt;
@@ -169,11 +169,7 @@ while count < 20
        vist =  cMu.*damping.*k.*Tt;
    end
    
-    if(count == 2)
-        plot(vist)
-        disp(Slambda)
-    end
-     
+   
    %Calculating source terms
    %Pk = (vist .* (dudy).^2);
 
@@ -194,6 +190,7 @@ while count < 20
    dampingCoeff = CalcDampingCoeffs(L_sq, dY, nj, BCDamping);
    % using visc and vist since rho = 1 --> kin_visc = dyn_visc
    
+      
    %Gauss-Seidel iteration
    U_new = GaussSeidel(U,uSu,UCoeff);
    R_new = GaussSeidel(R,RSu,RCoeff);
