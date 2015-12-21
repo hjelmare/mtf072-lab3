@@ -107,7 +107,7 @@ while count < 20
       dudy(j) = 2*a*dS + b;
    end
    
-   
+      
    %Computing cMu
    S = dudy .* sqrt(2);
    W = 2*dudy;
@@ -169,7 +169,10 @@ while count < 20
        vist(2:nj) =  cMu(2:nj).*damping(2:nj).*k(2:nj).*Tt(2:nj);
    end
    
-
+    if(count == 2)
+        plot(vist)
+        disp(Slambda)
+    end
      
    %Calculating source terms
    %Pk = (vist .* (dudy).^2);
@@ -178,8 +181,6 @@ while count < 20
    uSu = ones(nj,1) .* deltaY;    
    
    RSp = -C2 .* (dRtildedy).^2 .* deltaY ./ R;
-   disp('Hej')
-   disp(RSp(end-1))
    RSu = C1 .* Slambda .* deltaY;
     
    dampingSu = ones(nj,1);
@@ -228,6 +229,7 @@ Sk = sqrt(Stilde.^2 + Salpha.^2);
 ktilde = damping.^0.8 .* sqrt(cMu) .* R .* Sk;
 k = sqrt(ktilde.^2 + (visc.*Salpha).^2);
 
+disp(max(abs(imag(k))))
    
 % Convergence criterian (Check the error)
 % compute residuals R
