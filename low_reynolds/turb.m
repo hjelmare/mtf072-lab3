@@ -155,38 +155,27 @@ while count < 2
    vist_old=vist;
 
    
-   if count < 2000   % use mixing length model for turbulent viscosity if count >2000
-      for j=2:nj-1
-% compute turbulent viscosity
-         yplus=ustar*y_node(j)/visc;
-         damp=1-exp(-yplus/26);
-         ell=min(damp*kappa*y_node(j),0.09);
-         vist(j)=urf*abs(dudy(j))*ell^2+(1-urf)*vist_old(j);
-      end
-   else
+%    if count < 2000   % use mixing length model for turbulent viscosity if count >2000
+%       for j=2:nj-1
+% % compute turbulent viscosity
+%          yplus=ustar*y_node(j)/visc;
+%          damp=1-exp(-yplus/26);
+%          ell=min(damp*kappa*y_node(j),0.09);
+%          vist(j)=urf*abs(dudy(j))*ell^2+(1-urf)*vist_old(j);
+%       end
+%    else
        vist(2:nj-1) =  cMu(2:nj-1).*damping(2:nj-1).*k(2:nj-1).*Tt(2:nj-1);
-   end
+   %end
      
    %Calculating source terms
    %Pk = (vist .* (dudy).^2);
 
    uSp = zeros(nj,1);
-   uSu = ones(nj,1) .* deltaY;
-   %uSp(2) = -(cMu)^(1/4)*k(2)^(1/2);%*deltaY(2); % /U(2);
-   
-%   Perhaps useful reference for b.c. implementation
-%    kSp = (-eps./ k) .* deltaY;
-%    kSu = Pk .* deltaY;
-%    kSp(2) = -cMu^(3/4)*k(2)^(1/2);%*U(2);
-%    kSu(2) = U(2);
-% 
-%    epsSp = ((c1Eps .* Pk - c2Eps .* eps) ./ k) .* deltaY;
-%    epsSu = zeros(nj,1);
-%    epsSp(2) = -1e10;
-%    epsSu(2) = cMu^(3/4)*k(2)^(3/2)*1e10/(kappa*deltaY(2));
-%    
+   uSu = ones(nj,1) .* deltaY;    
    
    RSp = -C2 .* (dRtildedy).^2 .* deltaY ./ R;
+   disp('Hej')
+   disp(RSp(end-1))
    RSu = C1 .* Slambda .* deltaY;
  
    dampingSu = ones(nj,1);
@@ -195,7 +184,8 @@ while count < 2
 
    %Calculating coefficients
    UCoeff = CalcCoeffs( 1, dY, deltaY, visc, vist, uSp, nj, BCU);
-   RCoeff = CalcRCoeffs(U, R, sigma, dY, deltaY, visc, vist,RSp,nj, BCR);
+   [RCoeff,Su] = CalcRCoeffs2(U, R, sigma, dY, deltaY, visc, vist,RSp,nj, BCR);
+   RSu = RSu - Su; 
    dampingCoeff = CalcDampingCoeffs(L_sq, dY, nj, BCDamping);
    % using visc and vist since rho = 1 --> kin_visc = dyn_visc
    
@@ -204,9 +194,7 @@ while count < 2
    R_new = GaussSeidel(R,RSu,RCoeff);
    damping_new = GaussSeidel(damping, dampingSu, dampingCoeff);
    
-   U_new(end) = U_new(end-1);
-   R_new(end) = R_new(end-1);
-   damping(end) = damping(end-1);
+   
    
    %disp([epsCoeff.point, epsCoeff.south,epsCoeff.north])
    
@@ -218,6 +206,10 @@ while count < 2
     R(2:nj-1) = R(2:nj-1) + urC.*(R_new(2:nj-1) - R(2:nj-1));
     damping(2:nj-1) = damping(2:nj-1) + urC.*(damping_new(2:nj-1) - damping(2:nj-1));
    
+    U(end) = U(end-1);
+    R(end) = R(end-1);
+    damping(end) = damping(end-1);
+    
 % Create k and eps again
 Calpha = sqrt(cMu.^2 + (visc)./(R + visc));
 eta = S - W;
@@ -228,8 +220,6 @@ Stilde = fk.*(S - (abs(eta) - eta)/sqrt(2));
 Sk = sqrt(Stilde.^2 + Salpha.^2);
 ktilde = damping.^0.8 .* sqrt(cMu) .* R .* Sk;
 k = sqrt(ktilde.^2 + (visc.*Salpha).^2);
-
-disp([max(abs(imag(k)))])
 
    
 % Convergence criterian (Check the error)
