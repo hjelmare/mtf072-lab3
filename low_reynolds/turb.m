@@ -89,7 +89,7 @@ epsStore = [];
 %%
 old_error = error;
 %while error > max_error 
-while count < 2
+while count < 20
     
     count = count+1;
     
@@ -106,6 +106,7 @@ while count < 2
 
       dudy(j) = 2*a*dS + b;
    end
+   
    
    %Computing cMu
    S = dudy .* sqrt(2);
@@ -202,12 +203,7 @@ while count < 2
    % using visc and vist since rho = 1 --> kin_visc = dyn_visc
    
    %Gauss-Seidel iteration
-   figure(1*count + 1)
-   plot(U)
    U_new = GaussSeidel(U,uSu,UCoeff);
-   figure(2*count + 2)
-   plot(U_new)
-   
    R_new = GaussSeidel(R,RSu,RCoeff);
    damping_new = GaussSeidel(damping, dampingSu, dampingCoeff);
    
