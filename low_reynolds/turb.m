@@ -21,14 +21,9 @@ visc=1/395;
 C1 = 0.48;
 C2 = 0.08;
 urC = 0.1;
-<<<<<<< HEAD
 BCU = [2 2];
 BCR = [2 2];
-=======
-BCU = [0 0];
-BCR = [0 0];
-BCDamping = [0 0];  % Not sure...
->>>>>>> 793168034b6703024df0b427abee42fc4663a18d
+BCDamping = [2 2];  % Not sure...
 
 % wall friction velocity
 ustar=1;
@@ -68,7 +63,7 @@ for j=2:nj-1
    k(j)=10^(-5);
    eps(j)=10^(-5);
    vist(j)=10^(-5);
-   R = k(j)^2/eps(j);
+   R(j) = k(j)^2/eps(j);
 end
 k(nj)=k(nj-1);
 U(nj)=U(nj-1);
@@ -115,7 +110,7 @@ while error > max_error
    W = 2*dudy;
    Re = abs(W./S);
    Tt = sqrt(k.^2 ./ eps.^2 + 2*visc./eps);
-   cNy = 1 / (2*(1 + Tt .* S .* sqrt(1 + Re.^2)));
+   cNy = 1 ./ (2*(1 + Tt .* S .* sqrt(1 + Re.^2)));
    g = (1 + 2 * cNy .* psi.^2).^(-1);
    eta = alpha2 .* Tt .* S;
    cMu = 3 * (1 + eta.^2).*alpha1 ./ (3 + eta.^2 + 6*eta.^2*xi.^2 + 6*xi.^2);
@@ -193,7 +188,9 @@ while error > max_error
     damping(2:nj-1) = damping(2:nj-1) + urC.*(damping_new(2:nj-1) - damping(2:nj-1));
    
 % Create k and eps again
-% ...
+Sk = sqrt(Stilde.^2 + Salpha.^2);
+ktilde = damping.^0.8 .* sqrt(cMu) .* R .* Sk;
+k = sqrt(ktilde.^2 + kalpha.^2);
     
 % Convergence criterian (Check the error)
 % compute residuals R
