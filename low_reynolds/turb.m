@@ -13,14 +13,16 @@ clc
 format long
 
 %Defining simulation constants
-cMu = 0.09;
+cMuTilde = 0.09;
 sigmaR = 1;     % just guessing...
 c1Eps = 1.44;
 c2Eps = 1.92;
 visc=1/395;
+C1 = 0.48;
+C2 = 0.08;
 urC = 0.1;
-BCU = [0 0];
-BCR = [0 0];
+BCU = [2 2];
+BCR = [2 2];
 
 % wall friction velocity
 ustar=1;
@@ -59,10 +61,12 @@ for j=2:nj-1
    k(j)=10^(-5);
    eps(j)=10^(-5);
    vist(j)=10^(-5);
+   R = k(j)^2/eps(j);
 end
 k(nj)=k(nj-1);
 U(nj)=U(nj-1);
 eps(nj)=eps(nj-1);
+R(nj) = R(nj-1);
 
 kappa=0.41;
 error=1;
@@ -95,6 +99,16 @@ while error > max_error
 
       dudy(j) = 2*a*dS + b;
    end
+   
+   %Computing cMu
+   S = dudy .* sqrt(2);
+   W = 2*dudy;
+   Re = abs(W./S);
+   Tt = sqrt(k.^2 ./ eps.^2 + 2*visc./eps);
+   cNy = 1 / (2*(1 + Tt .* S .* sqrt(1 + Re.^2)));
+   g = (1 + 2 * cNy .* psi.^2).^(-1);
+   eta = alpha2 .* Tt .* S;
+   cMu = 3 * (1 + eta.^2).*alpha1 ./ (3 + eta.^2 + 6*eta.^2*xi.^2 + 6*xi.^2);
     
 %
 %
@@ -125,7 +139,7 @@ while error > max_error
 
    uSp = zeros(nj,1);
    uSu = ones(nj,1) .* deltaY;
-   uSp(2) = -(cMu)^(1/4)*k(2)^(1/2);%*deltaY(2); % /U(2);
+   %uSp(2) = -(cMu)^(1/4)*k(2)^(1/2);%*deltaY(2); % /U(2);
    
 %   Perhaps useful reference for b.c. implementation
 %    kSp = (-eps./ k) .* deltaY;
