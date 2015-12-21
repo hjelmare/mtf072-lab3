@@ -185,9 +185,8 @@ while error > max_error
 %    epsSu(2) = cMu^(3/4)*k(2)^(3/2)*1e10/(kappa*deltaY(2));
 %    
    
-%FIX THESE!
-   %RSp = -C2 .* (dRtildedy).^2 .* deltaY ./ R;
-   %RSu = C1 .* Slambda .* deltaY;
+   RSp = -C2 .* (dRtildedy).^2 .* deltaY ./ R;
+   RSu = C1 .* Slambda .* deltaY;
  
    dampingSu = 1;
 
