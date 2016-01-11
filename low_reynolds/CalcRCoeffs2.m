@@ -1,4 +1,4 @@
-function [ aCoeff, Su ] = CalcRCoeffs(U, R, sigma, dY, deltaY, viscosity, vist, ...
+function [ aCoeff, Su ] = CalcRCoeffs2(U, R, sigma, dY, deltaY, viscosity, vist, ...
     Sp, length , BC)
 %CALCCOEFFS Summary of this function goes here
 %   Detailed explanation goes here
@@ -29,7 +29,7 @@ function [ aCoeff, Su ] = CalcRCoeffs(U, R, sigma, dY, deltaY, viscosity, vist, 
     aCoeff.north(end-1) = aCoeff.north(end-1) * BC(2);
     
     aCoeff.point = aCoeff.north + aCoeff.south - Sp; 
-    disp(Sp(end-1));
+    
 
 end
 

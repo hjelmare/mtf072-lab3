@@ -1,4 +1,4 @@
-function [ aCoeff ] = CalcDampingCoeffs( L_sq, dY, length , BC)
+function [ aCoeff ] = CalcDampingCoeffs( L_sq, dY, Sp, length , BC)
 %CALCCOEFFS Summary of this function goes here
 %   Detailed explanation goes here
 
@@ -10,8 +10,8 @@ function [ aCoeff ] = CalcDampingCoeffs( L_sq, dY, length , BC)
 
     for i = 2:length-1
 
-        aCoeff.north(i) = (-L_sq(i))/(dYnorth(i)*(dYnorth(i) - dYsouth(i)));
-        aCoeff.south(i) = (-L_sq(i))/(dYsouth(i)*(dYnorth(i) - dYsouth(i)));
+        aCoeff.north(i) = L_sq(i) / dYnorth(i);
+        aCoeff.south(i) = L_sq(i) / dYsouth(i);
 
     end
     
@@ -19,7 +19,7 @@ function [ aCoeff ] = CalcDampingCoeffs( L_sq, dY, length , BC)
     aCoeff.south(2) = aCoeff.south(2) * BC(1);
     aCoeff.north(end-1) = aCoeff.north(end-1) * BC(2);
     
-    aCoeff.point = 1 - aCoeff.north - aCoeff.south; 
+    aCoeff.point = aCoeff.north + aCoeff.south + Sp; 
 
 
 end

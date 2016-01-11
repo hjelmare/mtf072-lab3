@@ -81,15 +81,15 @@ count=0;
 max_error=0.001;
 urf=0.8;
 
-disp('Go!')
+
 UStore = [];
 kStore = [];
 epsStore = [];
 
 %%
 old_error = error;
-%while error > max_error 
-while count < 2
+while error > max_error 
+%while count < 4
     
     count = count+1;
     
@@ -108,9 +108,10 @@ while count < 2
    end
    
    %Computing cMu
-   S = dudy .* sqrt(2);
-   W = 2*dudy;
+   S = abs(dudy) .* sqrt(2);
+   W = 2*abs(dudy);
    Re = sqrt(2);%abs(W./S);
+   Re_t = k.^2 ./ (visc .* eps);
    Tt = sqrt(k.^2 ./ eps.^2 + 2*visc./eps);
    psi = Tt .* S .* max(1,Re);
    cNy = 1 ./ (2*(1 + Tt .* S .* sqrt(1 + Re.^2)));
@@ -140,7 +141,7 @@ while count < 2
    
    %Computing other coefficients
    C1 = 2 * cMu .* psi .* (1 - cMu .* psi);
-   C2 = min(2*cMu,cMuTilde * sqrt(1 + (C1/(6*cMuTilde))));
+   C2 = 2*cMu;%min(2*cMu,cMuTilde * sqrt(1 + (C1/(6*cMuTilde))));
    sigma = cMu + damping./sqrt(2);
    Slambda = eps .* cNy .* psi.^2 .* Tt;
       
@@ -156,7 +157,7 @@ while count < 2
    vist_old=vist;
 
    
-   if count < -1 %2000   % use mixing length model for turbulent viscosity if count >2000
+   if count < -1   % use mixing length model for turbulent viscosity if count >2000
       for j=2:nj-1
 % compute turbulent viscosity
          yplus=ustar*y_node(j)/visc;
@@ -177,37 +178,36 @@ while count < 2
    uSu = ones(nj,1) .* deltaY;    
    
    RSp = -C2 .* (dRtildedy).^2 .* deltaY ./ R;
-   disp('Hej')
-   disp(RSp(end-1))
    RSu = C1 .* Slambda .* deltaY;
-    
-   dampingSu = ones(nj,1);
    
-   L_sq = psi.*(2*psi + cMu .* R ./visc).*sqrt(visc^3./eps);
+   L_sq = psi.*(2*psi + cMu .* Re_t).*sqrt(visc.^3./eps);
+   fSp = deltaY;
+   fSu = deltaY;
 
    %Calculating coefficients
    UCoeff = CalcCoeffs( 1, dY, deltaY, visc, vist, uSp, nj, BCU);
    [RCoeff,Su] = CalcRCoeffs2(U, R, sigma, dY, deltaY, visc, vist,RSp,nj, BCR);
    RSu = RSu - Su; 
-   dampingCoeff = CalcDampingCoeffs(L_sq, dY, nj, BCDamping);
+   dampingCoeff = CalcDampingCoeffs(L_sq, dY, fSp, nj, BCDamping);
+                  
    % using visc and vist since rho = 1 --> kin_visc = dyn_visc
    
    %Gauss-Seidel iteration
-   figure(1*count + 1)
-   plot(U)
+   %figure(1*count + 1)
+   %plot(U)
    U_new = GaussSeidel(U,uSu,UCoeff);
-   figure(2*count + 2)
-   plot(U_new)
+   %figure(2*count + 2)
+   %plot(U_new)
    
    R_new = GaussSeidel(R,RSu,RCoeff);
-   damping_new = GaussSeidel(damping, dampingSu, dampingCoeff);
+   damping_new = GaussSeidel(damping, fSu, dampingCoeff);
    
    %disp([epsCoeff.point, epsCoeff.south,epsCoeff.north])
    
-% after having computed ap and su, use under-relaxation (see lecture notes) 
-%  Compute the velocity U
+    % after having computed ap and su, use under-relaxation (see lecture notes) 
+    %  Compute the velocity U
    
-%  compute U & R
+    %  compute U & R
     U(2:nj-1) = U(2:nj-1) + urC.*(U_new(2:nj-1) - U(2:nj-1));
     R(2:nj-1) = R(2:nj-1) + urC.*(R_new(2:nj-1) - R(2:nj-1));
     damping(2:nj-1) = damping(2:nj-1) + urC.*(damping_new(2:nj-1) - damping(2:nj-1));
@@ -221,43 +221,58 @@ while count < 2
     R(end) = R(end-1);
     damping(end) = damping(end-1);
     
-% Create k and eps again
-Calpha = sqrt(cMu.^2 + (visc)./(R + visc));
-eta = S - W;
-falpha = 1 - exp(-(vist)/(36*visc));
-Salpha = (2*Calpha.*falpha)./(3*visc).*((sqrt(U.^2/2))./(1+(vist)./(visc))).^2;
-fk = 1 - (falpha)/sqrt(2) .* sqrt(max(1-Re, 0));
-Stilde = fk.*(S - (abs(eta) - eta)/sqrt(2));
-Sk = sqrt(Stilde.^2 + Salpha.^2);
-ktilde = damping.^0.8 .* sqrt(cMu) .* R .* Sk;
-k = sqrt(ktilde.^2 + (visc.*Salpha).^2);
+    % Create k and eps again
+    % Calculation of k
+    Calpha = sqrt(cMu.^2 + (visc)./(R + visc));
+    eta = S - W;
+    falpha = 1 - exp(-(vist)/(36*visc));
+    Salpha = (2*Calpha.*falpha)./(3*visc).*((sqrt(U.^2/2))./(1+(vist)./(visc))).^2;
+    fk = 1 - (falpha)/sqrt(2) .* sqrt(max(1-Re, 0));
+    Stilde = fk.*(S - (abs(eta) - eta)/sqrt(2));
+    Sk = sqrt(Stilde.^2 + Salpha.^2);
+    ktilde = damping.^0.8 .* sqrt(cMu) .* R .* Sk;
+    k = sqrt(ktilde.^2 + (visc.*Salpha).^2);
+    k(end) = k(end-1);
 
+    %Calculation of epsilon
+    epsAlpha = visc .* Salpha.^2;
+    Aeps = 0.09;
+    epsW = (2 * Aeps * visc) .* Sk.^2;
+    epsTilde = k.^2 ./ (R + visc);
+    eps = sqrt(epsW.^2 + epsTilde.^2 + epsAlpha.^2);
+    eps(end) = eps(end-1);
+    eps(1) = eps(2);
    
-% Convergence criterian (Check the error)
-% compute residuals R
+    % Convergence criterion (Check the error)
+    
+    % compute residuals R
      residual = ComputeResidual(U,UCoeff,uSu,R,RCoeff,RSu,nj);
-% compute the flux F
+    % compute the flux F
      F = ComputeFlux(U,deltaY,nj);
 
-  error = abs(residual/F);
-  if(mod(count,200) == 0)
-      UStore = [UStore U];
-      kStore = [kStore k];
-      epsStore = [epsStore eps];
-      
-      if(error > old_error)
-          urC = max(0.1*urC , 0.1);
-      else
-          urC = min(1.01*urC , 0.99999);
-      end
-      fprintf('%e,  %f \n',error, urC);
-      old_error = error;
-  end
+    error = abs(residual/F);
+    if(mod(count,200) == 0)
+        UStore = [UStore U];
+        kStore = [kStore k];
+        epsStore = [epsStore eps];
+
+        if(error > old_error)
+            urC = max(0.1*urC , 0.1);
+        else
+            urC = min(1.01*urC , 0.99999);
+        end
+        fprintf('%e,  %f \n',error, urC);
+        old_error = error;
+    end
   
-%   disp([R,F,max(diff(vist))])
-%   disp([ max(UCoeff.point) max(kCoeff.point) max(epsCoeff.point)])
-%   disp(max(epsSp))
-%   disp(' ')
+%     fprintf('imag U: %e \n', max(U));
+%     fprintf('imag R: %e \n', max(R));
+%     fprintf('imag eps: %e \n', max(eps));
+%     fprintf('imag k: %e \n', max(k));
+%     fprintf('imag f: %e \n', max(damping));
+%     fprintf('imag cMu: %e \n\n', max(cMu));
+%     pause;
+     
     
 
 end  %while
@@ -269,7 +284,7 @@ end  %while
 
 %%
 
-break
+%break
 
 figure(1)
 
