@@ -312,14 +312,14 @@ eps_dns=dns_data(:,2)*ustar^4/visc;
 plot(y_node,eps,'rx');
 plot(y_dns,eps_dns,'bo')
 xlabel('x')
-ylabel('\varepsilon - dissipation of k')
+ylabel('epsilon - dissipation of k')
 legend('Calc. eps','DNS')
 print eps.ps -deps
 
 figure(3)
 hold on
 plot(y_node,U,'rx')
-plot(y_dns,u_dns,'bo')
+plot(y_node,u_dns,'bo')
 xlabel('x')
 ylabel('U')
 legend('Calc. U','DNS')
