@@ -29,7 +29,7 @@ function [ aCoeff, Su ] = CalcRCoeffs2(U, R, sigma, dY, deltaY, viscosity, vist,
     aCoeff.north(end-1) = aCoeff.north(end-1) * BC(2);
     
     aCoeff.point = aCoeff.north + aCoeff.south - Sp; 
-    
+
 
 end
 

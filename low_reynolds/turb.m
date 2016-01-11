@@ -88,8 +88,10 @@ epsStore = [];
 
 %%
 old_error = error;
+
 while error > max_error 
 %while count < 4
+
     
     count = count+1;
     
@@ -107,6 +109,7 @@ while error > max_error
       dudy(j) = 2*a*dS + b;
    end
    
+      
    %Computing cMu
    S = abs(dudy) .* sqrt(2);
    W = 2*abs(dudy);
@@ -124,7 +127,7 @@ while error > max_error
    xi = alpha3 .* Tt .* W;
    cMu = 3 * (1 + eta.^2).*alpha1 ./ (3 + eta.^2 + 6*eta.^2 .* xi.^2 + 6*xi.^2);
    
-   
+    
    
    %Computing Rtilde gradient dRtildedy
    Rtilde = k .* Tt;
@@ -169,8 +172,7 @@ while error > max_error
        vist =  cMu.*damping.*k.*Tt;
    end
    
-
-     
+   
    %Calculating source terms
    %Pk = (vist .* (dudy).^2);
 
@@ -192,13 +194,10 @@ while error > max_error
                   
    % using visc and vist since rho = 1 --> kin_visc = dyn_visc
    
+      
    %Gauss-Seidel iteration
-   %figure(1*count + 1)
-   %plot(U)
    U_new = GaussSeidel(U,uSu,UCoeff);
-   %figure(2*count + 2)
-   %plot(U_new)
-   
+
    R_new = GaussSeidel(R,RSu,RCoeff);
    damping_new = GaussSeidel(damping, fSu, dampingCoeff);
    
@@ -221,6 +220,7 @@ while error > max_error
     R(end) = R(end-1);
     damping(end) = damping(end-1);
     
+
     % Create k and eps again
     % Calculation of k
     Calpha = sqrt(cMu.^2 + (visc)./(R + visc));
@@ -242,6 +242,7 @@ while error > max_error
     eps = sqrt(epsW.^2 + epsTilde.^2 + epsAlpha.^2);
     eps(end) = eps(end-1);
     eps(1) = eps(2);
+
    
     % Convergence criterion (Check the error)
     
