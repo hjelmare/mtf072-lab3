@@ -44,6 +44,8 @@ for j=2:nj-1
 end
 y_node(nj)=yc(nj-1);
 
+cMu = ones(nj,1) * cMu;
+
 %Calculating dY and deltaY
 dY(:,1) = [0 diff(y_node(2:end)') 0]';
 dY(:,2) = [0 diff(y_node(1:end-1)') 0]';
@@ -71,7 +73,7 @@ U(nj)=U(nj-1);
 eps(nj)=eps(nj-1);
 
 kappa=0.41;
-error=1;
+error=1000;
 count=0;
 max_error=0.001;
 urf=0.8;
@@ -146,7 +148,9 @@ while count < 100
          vist(j)=urf*abs(dudy(j))*ell^2+(1-urf)*vist_old(j);
       end
    else
-       vist(2:nj-1) =  cMu(2:nj-1) .* (k(2:nj-1).^2)./eps(2:nj-1);  
+       vist(2:nj-1) =  cMu(2:nj-1) .* (k(2:nj-1).^2)./eps(2:nj-1);
+       vist(1) = vist(2);
+       vist(end) = vist(end-1);
    end
      
    %Calculating source terms
@@ -170,9 +174,9 @@ while count < 100
    k_new = GaussSeidel(k,kSu,kCoeff);
    eps_new = GaussSeidel(eps,epsSu,epsCoeff);
    
-%    U_new(end,:) = U_new(end-1,:);
-%    k_new(end,:) = k_new(end-1,:);
-%    eps_new(end,:) = eps_new(end-1,:);
+   U_new(end,:) = U_new(end-1,:);
+   k_new(end,:) = k_new(end-1,:);
+   eps_new(end,:) = eps_new(end-1,:);
    
    %disp([epsCoeff.point, epsCoeff.south,epsCoeff.north])
    
@@ -203,16 +207,12 @@ while count < 100
       kStore = [kStore k];
       epsStore = [epsStore eps];
       
-      if(error > old_error)
-          urC = max(0.1*urC , 0.1);
-          fprintf('%e,  %f reducing \n',error, urC);
-      
-      else
-          urC = min(1.00*urC , 0.99999);
-          fprintf('%e,  %f increasing \n',error, urC);
-      
-      end
-      %fprintf('%e,  %f \n',error, urC);
+%       if(error > old_error)
+%           urC = max(0.1*urC , 0.1);
+%       else
+%           urC = min(1.01*urC , 0.99999);
+%       end
+      fprintf('Iteration: %d, %e,  %f \n',count,error, urC);
       old_error = error;
   end
   
@@ -290,18 +290,18 @@ print u.ps -deps
 %close all
 
 
-%%
-
-figure(1)
-contourf(UStore)
-%contourf(UStore(1:80,:))
-colorbar
-figure(2)
-contourf(kStore)
-%contourf(kStore(1:80,:))
-colorbar
-figure(3)
-contourf(epsStore)
-%contourf(epsStore(1:80,:))
-colorbar
+% %
+% 
+% figure(1)
+% contourf(UStore)
+% contourf(UStore(1:80,:))
+% colorbar
+% figure(2)
+% contourf(kStore)
+% contourf(kStore(1:80,:))
+% colorbar
+% figure(3)
+% contourf(epsStore)
+% contourf(epsStore(1:80,:))
+% colorbar
 
