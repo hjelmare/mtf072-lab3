@@ -87,7 +87,7 @@ epsStore = [];
 old_error = error;
 
 %while error > max_error 
-while count < 1
+while count < 599
    
     count = count+1;
     % implementing boundary conditions
@@ -99,7 +99,7 @@ while count < 1
     
     % Compute the gradients du/dy, d^2u/dy^2 and d(sqr(k))/dy
     % by fitting a quadratic function to three points and then
-    % using the derivative of the quadratic function
+    % using the analytical derivative of this quadratic function
    for j=2:nj-1
       %dudy(j)= (U(j+1) - U(j-1)) / (dY(j,1) + dY(j,2));
       
@@ -288,21 +288,20 @@ print u.ps -deps
 %
 
 
-%close all
+%%
 
+close all
 
-% %
-% 
-% figure(1)
-% contourf(UStore)
-% contourf(UStore(1:80,:))
-% colorbar
-% figure(2)
-% contourf(kStore)
-% contourf(kStore(1:80,:))
-% colorbar
-% figure(3)
-% contourf(epsStore)
-% contourf(epsStore(1:80,:))
-% colorbar
+figure(1)
+contourf(UStore)
+contourf(UStore(1:80,:))
+colorbar
+figure(2)
+contourf(kStore)
+contourf(kStore(1:80,:))
+colorbar
+figure(3)
+contourf(epsStore)
+contourf(epsStore(1:80,:))
+colorbar
 
