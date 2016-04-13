@@ -82,13 +82,14 @@ epsStore = [];
 
 %%
 old_error = error;
-%while error > max_error 
-while count < 2
+while error > max_error 
+%while count < 2
     
     count = count+1;
     % implementing boundary conditions
     U(end) = U(end-1);
     k(end) = k(end-1);
+    k(1) = 0;
     eps(end) = eps(end-1);
     eps(1) = 0;
     
@@ -117,6 +118,11 @@ while count < 2
       
       dsqrtkdy(j) = 2*a*dS + b;      
    end
+   
+   %Calculating cMu and c2
+   Rt = k.^2 ./ (visc .* eps);
+   cMu = 0.09  .* exp(-2.5 ./ (1 + 0.02*Rt));
+   c2 = 2.0 .* (1 - 0.3 .* exp(-Rt.^2));
     
 %
 %
