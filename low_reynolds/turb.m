@@ -203,7 +203,7 @@ while count < 400
      F = ComputeFlux(U,deltaY,nj);
 
   error = abs(R/F);
-  if(mod(count,200) == 0)
+  if(mod(count,10) == 0)
       UStore = [UStore U];
       kStore = [kStore k];
       epsStore = [epsStore eps];
