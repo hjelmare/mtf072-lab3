@@ -56,6 +56,7 @@ k = zeros(nj,1);
 eps = zeros(nj,1);
 vist = zeros(nj,1);
 dudy = zeros(nj,1);
+d2udy2 = zeros(nj,1);
 dsqrtkdy = zeros(nj,1);
 U(1)=0;
 k(1)=0;
