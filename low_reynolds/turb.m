@@ -19,7 +19,7 @@ cMu = 0.09;
 sigmaK = 1.00;
 sigmaEps = 1.30;
 visc=1/395;
-urC = 0.1;
+urC = 0.7;
 BCU = [2 2];
 BCk = [2 2];
 BCeps = [2 2];
@@ -38,18 +38,18 @@ yc=y_dns;          %yc is a vector contains the faces coordinates (grid)
 nj=length(yc)+1; % nj: number of node points  
 y_node = zeros(nj,1);
 u_dns(nj)=u_dns(nj-1);
-y_node(1)=yc(1);
+y_node(1)=(yc(1)-yc(2))/2;
 for j=2:nj-1   
     y_node(j)= (yc(j)+yc(j-1))/2;
 end
-y_node(nj)=yc(nj-1);
+y_node(nj)=yc(nj-1)+(yc(nj-1)-yc(nj-2))/2;
 
 cMu = ones(nj,1) * cMu;
 
 %Calculating dY and deltaY
 dY(:,1) = [0 diff(y_node(2:end)') 0]';
 dY(:,2) = [0 diff(y_node(1:end-1)') 0]';
-deltaY = [1 diff(yc') 1]';
+deltaY = [0 diff(yc') 0]';
 
 
 % init velocity, vist, k & eps
@@ -86,8 +86,8 @@ epsStore = [];
 %%
 old_error = error;
 
-while error > max_error 
-%while count < 2
+%while error > max_error 
+while count < 400
     
     count = count+1;
     % implementing boundary conditions
