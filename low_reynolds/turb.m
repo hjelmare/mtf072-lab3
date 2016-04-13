@@ -56,6 +56,7 @@ k = zeros(nj,1);
 eps = zeros(nj,1);
 vist = zeros(nj,1);
 dudy = zeros(nj,1);
+dsqrtkdy = zeros(nj,1);
 U(1)=0;
 k(1)=0;
 for j=2:nj-1
@@ -92,7 +93,9 @@ while count < 2
     eps(end) = eps(end-1);
     eps(1) = eps(2);
     
-    % Compute the velocity gradient du/dy
+    % Compute the velocity gradient du/dy and d(sqr(k))/dy
+    % by fitting a quadratic function to three points and then
+    % using the derivative of the quadratic function
    for j=2:nj-1
       %dudy(j)= (U(j+1) - U(j-1)) / (dY(j,1) + dY(j,2));
       
@@ -104,6 +107,11 @@ while count < 2
       a = -(U(j) - U(j+1) + dN*b)*factor/dS^2;
 
       dudy(j) = 2*a*dS + b;
+
+      b = (sqrt(k(j)) - sqrt(k(j-1)) + ((sqrt(k(j)) - sqrt(k(j+1)))*factor))/(dS - dN*factor);
+      a = -(sqrt(k(j)) - sqrt(k(j+1)) + dN*b)*factor/dS^2;
+      
+      dsqrtkdy(j) = 2*a*dS + b;      
    end
     
 %
