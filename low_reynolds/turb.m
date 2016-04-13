@@ -83,8 +83,8 @@ epsStore = [];
 
 %%
 old_error = error;
-while error > max_error 
-%while count < 2
+%while error > max_error 
+while count < 100
     
     count = count+1;
     % implementing boundary conditions
@@ -137,7 +137,7 @@ while error > max_error
    vist_old=vist;
 
    
-   if count < 2000   % use mixing length model for turbulent viscosity if count >2000
+   if count < 0   % use mixing length model for turbulent viscosity if count >2000
       for j=2:nj-1
 % compute turbulent viscosity
          yplus=ustar*y_node(j)/visc;
@@ -198,17 +198,21 @@ while error > max_error
      F = ComputeFlux(U,deltaY,nj);
 
   error = abs(R/F);
-  if(mod(count,200) == 0)
+  if(mod(count,10) == 0)
       UStore = [UStore U];
       kStore = [kStore k];
       epsStore = [epsStore eps];
       
       if(error > old_error)
           urC = max(0.1*urC , 0.1);
+          fprintf('%e,  %f reducing \n',error, urC);
+      
       else
-          urC = min(1.01*urC , 0.99999);
+          urC = min(1.00*urC , 0.99999);
+          fprintf('%e,  %f increasing \n',error, urC);
+      
       end
-      fprintf('%e,  %f \n',error, urC);
+      %fprintf('%e,  %f \n',error, urC);
       old_error = error;
   end
   
