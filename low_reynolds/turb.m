@@ -146,7 +146,7 @@ while error > max_error
          vist(j)=urf*abs(dudy(j))*ell^2+(1-urf)*vist_old(j);
       end
    else
-       vist(2:nj-1) =  cMu .* (k(2:nj-1).^2)./eps(2:nj-1);  
+       vist(2:nj-1) =  cMu(2:nj-1) .* (k(2:nj-1).^2)./eps(2:nj-1);  
    end
      
    %Calculating source terms
