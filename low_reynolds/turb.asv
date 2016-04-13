@@ -18,6 +18,8 @@ sigmaR = 1;     % just guessing...
 c1Eps = 1.44;
 c2Eps = 1.92;
 visc=1/395;
+C1 = 0.48;
+C2 = 0.08;
 urC = 0.5;
 BCU = [2 2];
 BCR = [2 2];
@@ -76,7 +78,7 @@ damping(nj) = damping(nj-1);
 kappa=0.41;
 error=1;
 count=0;
-max_error=0.0001;
+max_error=0.001;
 urf=0.8;
 
 
@@ -108,7 +110,7 @@ while error > max_error
    %Computing cMu
    S = abs(dudy) .* sqrt(2);
    W = sqrt(2)*abs(dudy);
-   Re = 1 * ones(nj,1);%W./S;
+   Re = 1;%W./S;
    Re_t = k.^2 ./ (visc .* eps);
    Tt = sqrt(k.^2 ./ eps.^2 + 2*visc./eps);
    psi = Tt .* S .* max(1,Re);
@@ -139,7 +141,7 @@ while error > max_error
    
    %Computing other coefficients
    C1 = 2 * cMu .* psi .* (1 - cMu .* psi);
-   C2 = min(2*cMu,cMuTilde * sqrt(1 + (C1/(6*cMuTilde)).^2));
+   C2 = 2*cMu;%min(2*cMu,cMuTilde * sqrt(1 + (C1/(6*cMuTilde))));
    sigma = cMu + damping./sqrt(2);
    Slambda = eps .* cNy .* psi.^2 .* Tt;
       
@@ -243,8 +245,7 @@ while error > max_error
     % Convergence criterion (Check the error)
     
     % compute residuals R
-     residual = ComputeResidual2(U,UCoeff,uSu,R,RCoeff,RSu,damping, ...
-         dampingCoeff,fSu,nj);
+     residual = ComputeResidual(U,UCoeff,uSu,R,RCoeff,RSu,nj);
     % compute the flux F
      F = ComputeFlux(U,deltaY,nj);
 
@@ -325,15 +326,15 @@ legend('Calc. U','DNS')
 print k.ps -deps
 
 % plot shear stress
-% figure(4)
-% hold on
-% load uv_dns.dat
-% plot(y_dns,-uv_dns,'bo')
-% plot(y_node,dudy,'rx')
-% xlabel('x')
-% ylabel('turbulent shear stress -uv')
-% legend('DNS','Calc.')
-% print uv.ps -deps
+figure(4)
+hold on
+load uv_dns.dat
+plot(y_dns,-uv_dns,'bo')
+plot(y_node,dudy,'rx')
+xlabel('x')
+ylabel('turbulent shear stress -uv')
+legend('DNS','Calc.')
+print uv.ps -deps
 
 % Compare also with the different terms in the k-eq. 
 % Read DNS data from file 'dns_data.dat'
