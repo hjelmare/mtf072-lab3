@@ -152,7 +152,7 @@ while error > max_error
    uSp = zeros(nj,1);
    uSu = ones(nj,1) .* deltaY;
    
-   kSp = (-deltaY./k) * (eps + dsqrtkdy.^2);
+   kSp = (-deltaY./k) .* (eps + dsqrtkdy.^2);
    kSu = deltaY .* vist .* dudy.^2;
 
    epsSp = -deltaY .* c2 .* eps ./ k;
