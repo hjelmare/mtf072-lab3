@@ -86,9 +86,10 @@ epsStore = [];
 %%
 old_error = error;
 
-%while error > max_error
+
 while count < 10
     
+
     count = count+1;
     % implementing boundary conditions
     U(end) = U(end-1);
