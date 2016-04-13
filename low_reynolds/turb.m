@@ -13,11 +13,11 @@ clc
 format long
 
 %Defining simulation constants
+c1 = 1.45;
+c2 = 2.0;
 cMu = 0.09;
 sigmaK = 1.00;
 sigmaEps = 1.30;
-c1Eps = 1.44;
-c2Eps = 1.92;
 visc=1/395;
 urC = 0.1;
 BCU = [2 2];
@@ -72,7 +72,6 @@ kappa=0.41;
 error=1;
 count=0;
 max_error=0.001;
-max_error=0.001;
 urf=0.8;
 
 disp('Go!')
@@ -90,7 +89,7 @@ while count < 2
     U(end) = U(end-1);
     k(end) = k(end-1);
     eps(end) = eps(end-1);
-    eps(1) = eps(2);
+    eps(1) = 0;
     
     % Compute the velocity gradient du/dy
    for j=2:nj-1
@@ -131,18 +130,14 @@ while count < 2
    end
      
    %Calculating source terms
-   Pk = (vist .* (dudy).^2);
-
    uSp = zeros(nj,1);
    uSu = ones(nj,1) .* deltaY;
    
-   kSp = (-eps./ k) .* deltaY;
-   kSu = Pk .* deltaY;
+   kSp = (-deltaY./k) * (eps + dsqrtkdy.^2);
+   kSu = deltaY .* vist .* dudy.^2;
 
-   epsSp = ((c1Eps .* Pk - c2Eps .* eps) ./ k) .* deltaY;
-   epsSu = zeros(nj,1); 
-%    epsSp = (( - c2Eps .* eps) ./ k) .* deltaY;
-%    epsSu = eps.*c1Eps .* Pk .* deltaY ./ k;
+   epsSp = -deltaY .* c2 .* eps ./ k;
+   epsSu = deltaY .* vist .* (c1 .* eps .* dudy.^2 ./ k + 2*visc .* d2udy2.^2); 
  
 
    %Calculating coefficients
