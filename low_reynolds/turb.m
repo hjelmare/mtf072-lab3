@@ -23,6 +23,9 @@ urC = 0.1;
 BCU = [2 2];
 BCk = [2 2];
 BCeps = [2 2];
+% for the new model:
+% at the wall, both eps and k should be kept at zero
+% at the middle, both gradients should be zero
 
 % wall friction velocity
 ustar=1;
