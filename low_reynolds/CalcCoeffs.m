@@ -12,15 +12,15 @@ function [ aCoeff ] = CalcCoeffs( sigma, dY, deltaY, viscosity, vist, ...
 
     for i = 2:length-1
         
-        aCoeff.north(i) = (viscosity + vist(i)/sigma) * (1/dYnorth(i));
-        aCoeff.south(i) = (viscosity + vist(i)/sigma) * (1/dYsouth(i));
+%         aCoeff.north(i) = (viscosity + vist(i)/sigma) * (1/dYnorth(i));
+%         aCoeff.south(i) = (viscosity + vist(i)/sigma) * (1/dYsouth(i));
         
         
-%         vistNorth = vist(i) + (vist(i+1) - vist(i))*deltaY(i) / (2*dYnorth(i));
-%         vistSouth = vist(i) - (vist(i) - vist(i-1))*deltaY(i) / (2*dYsouth(i));
-%         
-%         aCoeff.north(i) = ((viscosity + vistNorth/sigma)/dYnorth(i));
-%         aCoeff.south(i) = ((viscosity + vistSouth/sigma)/dYsouth(i));
+        vistNorth = vist(i) + (vist(i+1) - vist(i))*deltaY(i) / (2*dYnorth(i));
+        vistSouth = vist(i) - (vist(i) - vist(i-1))*deltaY(i) / (2*dYsouth(i));
+        
+        aCoeff.north(i) = ((viscosity + vistNorth/sigma)/dYnorth(i));
+        aCoeff.south(i) = ((viscosity + vistSouth/sigma)/dYsouth(i));
 
     end
     

@@ -130,6 +130,7 @@ while error > max_error
         %       dsqrtkdy(j) = 2*a*dS + b;
         
         dsqrtkdy(j) = ((sqrt(k(j+1)) - sqrt(k(j))) / (dY(j,1)) + (sqrt(k(j)) - sqrt(k(j-1))) / (dY(j,2)))/2;
+        %dsqrtkdy(j) = ((k(j+1) - k(j)) / (dY(j,1)) + (sqrt(k(j)) - sqrt(k(j-1))) / (dY(j,2)))/2;
     end
     
     
