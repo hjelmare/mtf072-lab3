@@ -20,7 +20,7 @@ sigmaK = 1.00;
 sigmaEps = 1.30;
 visc=1/395;
 urC = 0.7;
-BCU = [2 0];
+BCU = [2 2];
 BCk = [2 2];
 BCeps = [2 2];
 % for the new model:
