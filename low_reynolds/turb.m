@@ -87,7 +87,7 @@ epsStore = [];
 old_error = error;
 
 
-while count < 10
+while count < 600
     
 
     count = count+1;
@@ -96,7 +96,7 @@ while count < 10
     k(end) = k(end-1);
     k(1) = 0;
     eps(end) = eps(end-1);
-    eps(1) = eps(2);
+    eps(1) = 0;
     
     % Compute the gradients du/dy, d^2u/dy^2 and d(sqr(k))/dy
     % by fitting a quadratic function to three points and then
@@ -163,8 +163,8 @@ while count < 10
     kSp = (-deltaY./k) .* (eps + dsqrtkdy.^2);
     kSu = deltaY .* vist .* dudy.^2;
     
-    epsSp = -deltaY .* c2 .* eps ./ k;
-    epsSu = deltaY .* vist .* (c1 .* eps .* dudy.^2 ./ k + 2*visc .* d2udy2.^2);
+    epsSp = -deltaY .* c2 .* eps ./ k + deltaY .* vist .* c1 .* dudy.^2 ./ k;
+    epsSu = deltaY .* vist .* (2*visc .* d2udy2.^2);
     
     
     %Calculating coefficients
