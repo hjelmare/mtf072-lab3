@@ -86,10 +86,8 @@ epsStore = [];
 %%
 old_error = error;
 
-
-while count < 600
-    
-
+%while error > max_error 
+while count < 599
     count = count+1;
     % implementing boundary conditions
     U(end) = U(end-1);
@@ -100,30 +98,31 @@ while count < 600
     
     % Compute the gradients du/dy, d^2u/dy^2 and d(sqr(k))/dy
     % by fitting a quadratic function to three points and then
-    % using the derivative of the quadratic function
-    for j=2:nj-1
-        %dudy(j)= (U(j+1) - U(j-1)) / (dY(j,1) + dY(j,2));
-        
-        dN = dY(j,1);
-        dS = dY(j,2);
-        factor = dS^2/(2*dN*dS + dN^2);
-        
-        b = (U(j) - U(j-1) + ((U(j) - U(j+1))*factor))/(dS - dN*factor);
-        a = -(U(j) - U(j+1) + dN*b)*factor/dS^2;
-        
-        dudy(j) = 2*a*dS + b;
-        
-        b = (dudy(j) - dudy(j-1) + ((dudy(j) - dudy(j+1))*factor))/(dS - dN*factor);
-        a = -(dudy(j) - dudy(j+1) + dN*b)*factor/dS^2;
-        
-        d2udy2(j) = 2*a*dS + b;
-        
-        b = (sqrt(k(j)) - sqrt(k(j-1)) + ((sqrt(k(j)) - sqrt(k(j+1)))*factor))/(dS - dN*factor);
-        a = -(sqrt(k(j)) - sqrt(k(j+1)) + dN*b)*factor/dS^2;
-        
-        dsqrtkdy(j) = 2*a*dS + b;
-    end
-    
+    % using the analytical derivative of this quadratic function
+   for j=2:nj-1
+      %dudy(j)= (U(j+1) - U(j-1)) / (dY(j,1) + dY(j,2));
+      
+      dN = dY(j,1);
+      dS = dY(j,2);
+      factor = dS^2/(2*dN*dS + dN^2);
+      
+      b = (U(j) - U(j-1) + ((U(j) - U(j+1))*factor))/(dS - dN*factor);
+      a = -(U(j) - U(j+1) + dN*b)*factor/dS^2;
+
+      dudy(j) = 2*a*dS + b;
+
+      b = (dudy(j) - dudy(j-1) + ((dudy(j) - dudy(j+1))*factor))/(dS - dN*factor);
+      a = -(dudy(j) - dudy(j+1) + dN*b)*factor/dS^2;
+      
+      d2udy2(j) = 2*a*dS + b;
+
+      b = (sqrt(k(j)) - sqrt(k(j-1)) + ((sqrt(k(j)) - sqrt(k(j+1)))*factor))/(dS - dN*factor);
+      a = -(sqrt(k(j)) - sqrt(k(j+1)) + dN*b)*factor/dS^2;
+      
+      dsqrtkdy(j) = 2*a*dS + b;      
+   end
+   
+   
     %Calculating cMu and c2
     Rt = k.^2 ./ (visc .* eps);
     cMu = 0.09  .* exp(-2.5 ./ (1 + 0.02*Rt));
@@ -290,21 +289,19 @@ print u.ps -deps
 %
 
 
-%close all
+%%
 
+close all
 
-% %
-%
-% figure(1)
-% contourf(UStore)
-% contourf(UStore(1:80,:))
-% colorbar
-% figure(2)
-% contourf(kStore)
-% contourf(kStore(1:80,:))
-% colorbar
-% figure(3)
-% contourf(epsStore)
-% contourf(epsStore(1:80,:))
-% colorbar
-
+figure(4)
+contourf(UStore)
+contourf(UStore(1:80,:))
+colorbar
+figure(5)
+contourf(kStore)
+contourf(kStore(1:80,:))
+colorbar
+figure(6)
+contourf(epsStore)
+contourf(epsStore(1:80,:))
+colorbar
