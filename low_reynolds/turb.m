@@ -100,26 +100,31 @@ while count < 599
     % by fitting a quadratic function to three points and then
     % using the analytical derivative of this quadratic function
    for j=2:nj-1
-      %dudy(j)= (U(j+1) - U(j-1)) / (dY(j,1) + dY(j,2));
       
-      dN = dY(j,1);
-      dS = dY(j,2);
-      factor = dS^2/(2*dN*dS + dN^2);
-      
-      b = (U(j) - U(j-1) + ((U(j) - U(j+1))*factor))/(dS - dN*factor);
-      a = -(U(j) - U(j+1) + dN*b)*factor/dS^2;
+%       dN = dY(j,1);
+%       dS = dY(j,2);
+%       factor = dS^2/(2*dN*dS + dN^2);
+%       
+%       b = (U(j) - U(j-1) + ((U(j) - U(j+1))*factor))/(dS - dN*factor);
+%       a = -(U(j) - U(j+1) + dN*b)*factor/dS^2;
+% 
+%       dudy(j) = 2*a*dS + b;
 
-      dudy(j) = 2*a*dS + b;
+      dudy(j) = ((U(j+1) - U(j)) / (dY(j,1)) + (U(j) - U(j-1)) / (dY(j,2)))/2;
 
-      b = (dudy(j) - dudy(j-1) + ((dudy(j) - dudy(j+1))*factor))/(dS - dN*factor);
-      a = -(dudy(j) - dudy(j+1) + dN*b)*factor/dS^2;
-      
-      d2udy2(j) = 2*a*dS + b;
+%       b = (dudy(j) - dudy(j-1) + ((dudy(j) - dudy(j+1))*factor))/(dS - dN*factor);
+%       a = -(dudy(j) - dudy(j+1) + dN*b)*factor/dS^2;
+%       
+%       d2udy2(j) = 2*a*dS + b;
 
-      b = (sqrt(k(j)) - sqrt(k(j-1)) + ((sqrt(k(j)) - sqrt(k(j+1)))*factor))/(dS - dN*factor);
-      a = -(sqrt(k(j)) - sqrt(k(j+1)) + dN*b)*factor/dS^2;
+      d2udy2(j) = ((U(j+1) - U(j)) / (dY(j,1)) - (U(j) - U(j-1)) / (dY(j,2)))/deltaY(j);
       
-      dsqrtkdy(j) = 2*a*dS + b;      
+%       b = (sqrt(k(j)) - sqrt(k(j-1)) + ((sqrt(k(j)) - sqrt(k(j+1)))*factor))/(dS - dN*factor);
+%       a = -(sqrt(k(j)) - sqrt(k(j+1)) + dN*b)*factor/dS^2;
+%       
+%       dsqrtkdy(j) = 2*a*dS + b;
+
+      dsqrtkdy(j) = ((sqrt(k(j+1)) - sqrt(k(j))) / (dY(j,1)) + (sqrt(k(j)) - sqrt(k(j-1))) / (dY(j,2)))/2;
    end
    
    
