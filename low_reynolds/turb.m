@@ -310,3 +310,17 @@ figure(6)
 contourf(epsStore)
 contourf(epsStore(1:80,:))
 colorbar
+
+
+%%
+
+figure(7)
+plot(y_node,U)
+figure(8)
+plot(y_node,dudy)
+figure(9)
+plot(y_node,d2udy2)
+temp_axis = axis;
+temp_axis(3) = -150;
+temp_axis(4) = 200;
+axis(temp_axis)
