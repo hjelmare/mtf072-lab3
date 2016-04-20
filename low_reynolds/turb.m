@@ -93,8 +93,9 @@ while count < 599
     % implementing boundary conditions
     U(end) = U(end-1);
     k(end) = k(end-1);
-    k(1) = 0;
     eps(end) = eps(end-1);
+    U(1) = 0;
+    k(1) = 0;
     eps(1) = 0;
     
     % Compute the gradients du/dy, d^2u/dy^2 and d(sqr(k))/dy
@@ -127,7 +128,6 @@ while count < 599
 
       dsqrtkdy(j) = ((sqrt(k(j+1)) - sqrt(k(j))) / (dY(j,1)) + (sqrt(k(j)) - sqrt(k(j-1))) / (dY(j,2)))/2;
    end
-   
    
     %Calculating cMu and c2
     Rt = k.^2 ./ (visc .* eps);
@@ -210,7 +210,7 @@ while count < 599
     F = ComputeFlux(U,deltaY,nj);
     
     error = abs(R/F);
-    if(mod(count,10) == 0)
+    if(mod(count,1) == 0)
         UStore = [UStore U];
         kStore = [kStore k];
         epsStore = [epsStore eps];
@@ -299,21 +299,23 @@ print u.ps -deps
 
 close all
 
+xlim = 50;
+
 figure(4)
-contourf(UStore)
-contourf(UStore(1:80,:))
+%contourf(UStore)
+contourf(UStore(:,1:xlim))
 colorbar
 figure(5)
-contourf(kStore)
-contourf(kStore(1:80,:))
+%contourf(kStore)
+contourf(kStore(:,1:xlim))
 colorbar
 figure(6)
-contourf(epsStore)
-contourf(epsStore(1:80,:))
+%contourf(epsStore)
+contourf(epsStore(:,1:xlim))
 colorbar
 
 
-%%
+%% plot u, dudy and d2udy2 to check that they're reasonable...
 
 figure(7)
 plot(y_node,U)
