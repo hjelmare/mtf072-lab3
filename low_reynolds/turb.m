@@ -22,8 +22,8 @@ sigmaEps = 1.30;
 visc=1/395;
 urC = 0.7;
 BCU = [2 1];
-BCk = [2 2];
-BCeps = [2 2];
+BCk = [2 1];
+BCeps = [2 1];
 % for the new model:
 % at the wall, both eps and k should be kept at zero
 % at the middle, both gradients should be zero
@@ -87,7 +87,7 @@ epsStore = [];
 %%
 old_error = error;
 
-%while error > max_error 
+%while error > max_error
 while count < 599
     
     count = count+1;
@@ -104,38 +104,35 @@ while count < 599
     % Compute the gradients du/dy, d^2u/dy^2 and d(sqr(k))/dy
     % by fitting a quadratic function to three points and then
     % using the analytical derivative of this quadratic function
-   for j=2:nj-1
-      
-%       dN = dY(j,1);
-%       dS = dY(j,2);
-%       factor = dS^2/(2*dN*dS + dN^2);
-%       
-%       b = (U(j) - U(j-1) + ((U(j) - U(j+1))*factor))/(dS - dN*factor);
-%       a = -(U(j) - U(j+1) + dN*b)*factor/dS^2;
-% 
-%       dudy(j) = 2*a*dS + b;
-
-      dudy(j) = ((U(j+1) - U(j)) / (dY(j,1)) + (U(j) - U(j-1)) / (dY(j,2)))/2;
-
-%       b = (dudy(j) - dudy(j-1) + ((dudy(j) - dudy(j+1))*factor))/(dS - dN*factor);
-%       a = -(dudy(j) - dudy(j+1) + dN*b)*factor/dS^2;
-%       
-%       d2udy2(j) = 2*a*dS + b;
-
-      d2udy2(j) = ((U(j+1) - U(j)) / (dY(j,1)) - (U(j) - U(j-1)) / (dY(j,2)))/deltaY(j);
-      
-%       b = (sqrt(k(j)) - sqrt(k(j-1)) + ((sqrt(k(j)) - sqrt(k(j+1)))*factor))/(dS - dN*factor);
-%       a = -(sqrt(k(j)) - sqrt(k(j+1)) + dN*b)*factor/dS^2;
-%       
-%       dsqrtkdy(j) = 2*a*dS + b;
-
-      dsqrtkdy(j) = ((sqrt(k(j+1)) - sqrt(k(j))) / (dY(j,1)) + (sqrt(k(j)) - sqrt(k(j-1))) / (dY(j,2)))/2;
-   end
-   
-    %Calculating cMu and c2
-    Rt = k.^2 ./ (visc .* eps);
-    cMu = 0.09  .* exp(-2.5 ./ (1 + 0.02*Rt));
-    c2 = 2.0 .* (1 - 0.3 .* exp(-Rt.^2));
+    for j=2:nj-1
+        
+        %       dN = dY(j,1);
+        %       dS = dY(j,2);
+        %       factor = dS^2/(2*dN*dS + dN^2);
+        %
+        %       b = (U(j) - U(j-1) + ((U(j) - U(j+1))*factor))/(dS - dN*factor);
+        %       a = -(U(j) - U(j+1) + dN*b)*factor/dS^2;
+        %
+        %       dudy(j) = 2*a*dS + b;
+        
+        dudy(j) = ((U(j+1) - U(j)) / (dY(j,1)) + (U(j) - U(j-1)) / (dY(j,2)))/2;
+        
+        %       b = (dudy(j) - dudy(j-1) + ((dudy(j) - dudy(j+1))*factor))/(dS - dN*factor);
+        %       a = -(dudy(j) - dudy(j+1) + dN*b)*factor/dS^2;
+        %
+        %       d2udy2(j) = 2*a*dS + b;
+        
+        d2udy2(j) = ((U(j+1) - U(j)) / (dY(j,1)) - (U(j) - U(j-1)) / (dY(j,2)))/deltaY(j);
+        
+        %       b = (sqrt(k(j)) - sqrt(k(j-1)) + ((sqrt(k(j)) - sqrt(k(j+1)))*factor))/(dS - dN*factor);
+        %       a = -(sqrt(k(j)) - sqrt(k(j+1)) + dN*b)*factor/dS^2;
+        %
+        %       dsqrtkdy(j) = 2*a*dS + b;
+        
+        dsqrtkdy(j) = ((sqrt(k(j+1)) - sqrt(k(j))) / (dY(j,1)) + (sqrt(k(j)) - sqrt(k(j-1))) / (dY(j,2)))/2;
+    end
+    
+    
     
     %
     %
@@ -149,30 +146,36 @@ while count < 599
     vist_old=vist;
     
     
-    if count < 0   % use mixing length model for turbulent viscosity if count >2000
+    if count < 0  % use mixing length model for turbulent viscosity if count >2000
         for j=2:nj-1
             % compute turbulent viscosity
-            %          yplus=ustar*y_node(j)/visc;
-            %          damp=1-exp(-yplus/26);
-            %          ell=min(damp*kappa*y_node(j),0.09);
-            %          vist(j)=urf*abs(dudy(j))*ell^2+(1-urf)*vist_old(j);
-            vist(j) = 1;
+            yplus=ustar*y_node(j)/visc;
+            damp=1-exp(-yplus/26);
+            ell=min(damp*kappa*y_node(j),0.09);
+            vist(j)=urf*abs(dudy(j))*ell^2+(1-urf)*vist_old(j);
+            
         end
     else
+        %Calculating turbulent viscosity
         vist(2:nj-1) =  cMu(2:nj-1) .* (k(2:nj-1).^2)./eps(2:nj-1);
         vist(1) = vist(2);
         vist(end) = vist(end-1);
+        
+        %Calculating cMu and c2
+        Rt = k.^2 ./ (visc .* eps);
+        cMu = 0.09  .* exp(-2.5 ./ (1 + 0.02*Rt));
+        c2 = 2.0 .* (1 - 0.3 .* exp(-Rt.^2));
     end
     
     %Calculating source terms
     uSp = zeros(nj,1);
     uSu = ones(nj,1) .* deltaY;
     
-    kSp = (-deltaY./k) .* (eps + dsqrtkdy.^2);
+    kSp = (-eps - 2*visc .* dsqrtkdy.^2) .* deltaY ./ k;
     kSu = deltaY .* vist .* dudy.^2;
     
-    epsSp = -deltaY .* c2 .* eps ./ k + deltaY .* vist .* c1 .* dudy.^2 ./ k;
-    epsSu = deltaY .* vist .* (2*visc .* d2udy2.^2);
+    epsSp = -deltaY .* c2 .* eps ./ k;
+    epsSu = deltaY .* vist .* (c1 .* eps .* dudy.^2 ./ k + 2 * visc .* d2udy2.^2); 
     
     
     %Calculating coefficients
