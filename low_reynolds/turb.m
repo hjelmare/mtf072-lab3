@@ -22,8 +22,8 @@ sigmaEps = 1.30;
 visc=1/395;
 urC = 0.7;
 BCU = [2 1];
-BCk = [2 2];
-BCeps = [2 2];
+BCk = [2 1];
+BCeps = [2 1];
 % for the new model:
 % at the wall, both eps and k should be kept at zero
 % at the middle, both gradients should be zero
@@ -87,8 +87,8 @@ epsStore = [];
 %%
 old_error = error;
 
-%while error > max_error 
-while count < 599
+while error > max_error 
+%while count < 599
     
     count = count+1;
     
@@ -211,7 +211,7 @@ while count < 599
     R = ComputeResidual(U,UCoeff,uSu,k,kCoeff,kSu,eps,epsCoeff,epsSu,nj);
     % compute the flux F
     F = ComputeFlux(U,deltaY,nj);
-    
+        
     error = abs(R/F);
     if(mod(count,1) == 0)
         UStore = [UStore U];
@@ -234,11 +234,7 @@ while count < 599
     
     
 end  %while
-%
-% plot
-% compare with DNS
-%
-% plot k
+
 
 %%
 
@@ -302,19 +298,20 @@ print u.ps -deps
 
 close all
 
-xlim = 50;
+xmin = 1;
+xmax = 14000;
 
 figure(4)
 %contourf(UStore)
-contourf(UStore(:,1:xlim))
+contourf(UStore(:,xmin:xmax))
 colorbar
 figure(5)
 %contourf(kStore)
-contourf(kStore(:,1:xlim))
+contourf(kStore(:,xmin:xmax))
 colorbar
 figure(6)
 %contourf(epsStore)
-contourf(epsStore(:,1:xlim))
+contourf(epsStore(:,xmin:xmax))
 colorbar
 
 
