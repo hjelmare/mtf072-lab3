@@ -16,11 +16,12 @@ format long
 c1 = 1.45;
 c2 = 2.0;
 cMu = 0.09;
+sigmaU = 1.00;
 sigmaK = 1.00;
 sigmaEps = 1.30;
 visc=1/395;
 urC = 0.7;
-BCU = [2 0];
+BCU = [2 2];
 BCk = [2 2];
 BCeps = [2 2];
 % for the new model:
@@ -167,7 +168,7 @@ while count < 599
     
     
     %Calculating coefficients
-    UCoeff = CalcCoeffs( 1, dY, deltaY, visc, vist, uSp, nj, BCU);
+    UCoeff = CalcCoeffs( sigmaU, dY, deltaY, visc, vist, uSp, nj, BCU);
     kCoeff = CalcCoeffs( sigmaK, dY, deltaY, visc, vist, kSp, nj, BCk);
     epsCoeff = CalcCoeffs( sigmaEps, dY, deltaY, visc, vist, epsSp, nj,BCeps);
     
