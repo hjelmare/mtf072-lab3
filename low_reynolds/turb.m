@@ -21,7 +21,7 @@ sigmaK = 1.00;
 sigmaEps = 1.30;
 visc=1/395;
 urC = 0.7;
-BCU = [2 2];
+BCU = [2 1];
 BCk = [2 2];
 BCeps = [2 2];
 % for the new model:
@@ -89,9 +89,12 @@ old_error = error;
 
 %while error > max_error 
 while count < 599
+    
     count = count+1;
+    
     % implementing boundary conditions
     U(end) = U(end-1);
+    U(1) = 0;
     k(end) = k(end-1);
     k(1) = 0;
     eps(end) = eps(end-1);
