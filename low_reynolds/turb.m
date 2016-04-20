@@ -87,8 +87,8 @@ epsStore = [];
 %%
 old_error = error;
 
-%while error > max_error
-while count < 599
+while error > max_error
+%while count < 599
     
     count = count+1;
     
@@ -130,6 +130,7 @@ while count < 599
         %       dsqrtkdy(j) = 2*a*dS + b;
         
         dsqrtkdy(j) = ((sqrt(k(j+1)) - sqrt(k(j))) / (dY(j,1)) + (sqrt(k(j)) - sqrt(k(j-1))) / (dY(j,2)))/2;
+        %dsqrtkdy(j) = ((k(j+1) - k(j)) / (dY(j,1)) + (sqrt(k(j)) - sqrt(k(j-1))) / (dY(j,2)))/2;
     end
     
     
@@ -146,7 +147,7 @@ while count < 599
     vist_old=vist;
     
     
-    if count < 0  % use mixing length model for turbulent viscosity if count >2000
+    if count < 500  % use mixing length model for turbulent viscosity if count >2000
         for j=2:nj-1
             % compute turbulent viscosity
             yplus=ustar*y_node(j)/visc;
